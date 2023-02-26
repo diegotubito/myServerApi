@@ -1,5 +1,6 @@
 const { response } = require("express")
 const User = require('../Model/user_model')
+const bcrypt = require('bcrypt')
 
 const userGet = async (req, res = response) => {
     try {
@@ -13,8 +14,13 @@ const userGet = async (req, res = response) => {
 const userPost = async (req, res = response) => {
     const body = req.body
 
+    //setup password
+    const saltRounds = 10
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hash = bcrypt.hashSync(body.password, salt);
+    body.password = hash
+  
     const user = User(body)
-
     try {
         const newUser = await user.save()
         res.json(newUser)
