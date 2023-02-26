@@ -1,14 +1,10 @@
 const User = require('../../Model/user_model')
 
-const checkUniqueEmail = async (req, res, next) => {
-     //check if user exist
-     const body = req.body
-     const isUser = await User.findOne({email: body.email})
-     if (isUser) {
-        return res.status(400).json('Email already exists')
-     }
-
-     next()
+const checkUniqueEmail = async (email = '') => {
+    const isUser = await User.findOne({email: email})
+    if (isUser) {
+        throw new Error('el email ya exsite')
+    }
 }
 
 module.exports = checkUniqueEmail

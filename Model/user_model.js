@@ -11,7 +11,6 @@ const UserSchema = Schema({
     },
     password: {
         type: String,
-        select: false
     },
     createdAt: {
         type: Date,
@@ -19,4 +18,16 @@ const UserSchema = Schema({
     }
 })
 
+// Overriding toJSON method
+// This is used for deleting some parameters we don't want to show in any response.
+// I am hidding __v and password property
+
+/*
+UserSchema.methods.toJSON = function() {
+    const { __v, password, ...cleanUser } = this.toObject();
+    return cleanUser
+}
+*/
+
 module.exports = model('user', UserSchema)
+

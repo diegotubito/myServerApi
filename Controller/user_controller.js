@@ -30,7 +30,8 @@ const userPost = async (req, res = response) => {
 }
 
 const userDelete = async (req, res = response) => {
-    const _id = req.query._id
+    const _id = req.params._id
+    
     try {
         const user = await User.deleteOne({_id})
         res.json(user)        
@@ -41,10 +42,12 @@ const userDelete = async (req, res = response) => {
 
 const userUpdate = async (req, res = response) => {
     const body = req.body
-    const _id = req.body._id
+    const id = req.params.id
 
+    const { email, createdAt, _id, password, ... filterBody } = body
+   
     try {
-        const updated = await User.updateOne({_id}, body)
+        const updated = await User.updateOne({_id: id}, filterBody)
         res.json(updated)
     } catch (error) {
         res.status(500).json(error)
