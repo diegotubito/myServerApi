@@ -4,8 +4,19 @@ const bcrypt = require('bcrypt')
 
 const userGet = async (req, res = response) => {
     try {
-        const users = await User.find({})
-        res.json(users)        
+       // const users = await User.find()
+       // const count = await User.countDocuments()
+        
+        // Due to User.countDocuments() doesn't need to wait for User.find() result.
+        // I can perform the upper operations concurrently
+        // in this way, we improve response time performance.
+       
+        const [users, count] = await Promise.all([
+            User.find({isEnabled: true}),
+            User.countDocuments()
+        ])
+       
+        res.json({count, users})        
     } catch (error) {
         res.status(500).json(error)
     }
