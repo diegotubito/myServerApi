@@ -22,8 +22,8 @@ class Server {
     }
 
     connect() {
-        this.app.listen(3000, () => {
-            console.log('Server running at 3000')
+        this.app.listen(process.env.PORT, () => {
+            console.log('Server running at', process.env.PORT)
             this.#connectDB()
         })
     }
