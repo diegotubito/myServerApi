@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
 const {connectDataBase} = require('../Database/database')
 
 class Server {
@@ -12,6 +13,7 @@ class Server {
     }
 
     #middleware() {
+        this.app.use(cors())
         this.app.use(express.json())
     }
 
