@@ -1,19 +1,48 @@
 const { response } = require("express")
+const User = require('../Model/user_model')
 
-const userGet = (req, res = response) => {
-    res.send('Get request')
+const userGet = async (req, res = response) => {
+    try {
+        const users = await User.find({})
+        res.json(users)        
+    } catch (error) {
+        res.status(500).json(error)
+    }
 }
 
-const userPost = (req, res = response) => {
-    res.send('Post request')
+const userPost = async (req, res = response) => {
+    const body = req.body
+
+    const user = User(body)
+
+    try {
+        const newUser = await user.save()
+        res.json(newUser)
+    } catch (error) {
+        res.status(500).json(error)
+    }
 }
 
-const userDelete = (req, res = response) => {
-    res.send('Delete request')
+const userDelete = async (req, res = response) => {
+    const _id = req.query._id
+    try {
+        const user = await User.deleteOne({_id})
+        res.json(user)        
+    } catch (error) {
+        res.status(500).json(error)
+    }
 }
 
-const userUpdate = (req, res = response) => {
-    res.send('Update request')
+const userUpdate = async (req, res = response) => {
+    const body = req.body
+    const _id = req.body._id
+
+    try {
+        const updated = await User.updateOne({_id}, body)
+        res.json(updated)
+    } catch (error) {
+        res.status(500).json(error)
+    }
 }
 
 module.exports = { userGet, userPost, userUpdate, userDelete }
