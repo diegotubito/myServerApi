@@ -19,6 +19,7 @@ class Server {
 
     #router() {
         this.app.use('', require('../Router/user_router'))
+        this.app.use('/api/v1/auth', require('../Router/login_router'))
     }
 
     connect() {
