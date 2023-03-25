@@ -7,7 +7,7 @@ const loginPost = async (req, res = response) => {
     const {email, password} = req.body
 
     try {
-        const user = await User.findOne({email})
+        const user = await User.findOne({email, isEnabled: true})
         if (!user) {
             return res.status(400).json('user does not exist')
         }
@@ -17,8 +17,8 @@ const loginPost = async (req, res = response) => {
             return res.status(400).json('password incorrect')
         }
 
-        const {uid} = user
-        const token = jwtoken.sign({ data: uid }, process.env.PUBLIC_SECRET_KEY, { expiresIn: '1h' });
+        const {_id} = user
+        const token = jwtoken.sign({ _id: _id }, process.env.PUBLIC_SECRET_KEY, { expiresIn: 60 * 60 });
 
         res.json({
             user,

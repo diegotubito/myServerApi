@@ -15,6 +15,14 @@ const UserSchema = Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    isEnabled: {
+        type: Boolean,
+        default: true
+    },
+    role: {
+        type: String,
+        default: "USER_ROLE"
     }
 })
 
@@ -24,11 +32,9 @@ const UserSchema = Schema({
 
 
 UserSchema.methods.toJSON = function() {
-    const { __v, password, _id, ...cleanUser } = this.toObject();
-    cleanUser.uid = _id
+    const { __v, password, ...cleanUser } = this.toObject();
     return cleanUser
 }
-
 
 module.exports = model('user', UserSchema)
 
