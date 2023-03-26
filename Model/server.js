@@ -3,6 +3,7 @@ const app = express()
 const cors = require('cors')
 const {connectDataBase} = require('../Database/database')
 
+
 class Server {
     constructor() {
         this.app = app
@@ -20,6 +21,7 @@ class Server {
     #router() {
         this.app.use('', require('../Router/user_router'))
         this.app.use('/api/v1/auth', require('../Router/login_router'))
+        this.app.use('/api/v1/stripe', require('../Router/stripe_route'))
     }
 
     connect() {
