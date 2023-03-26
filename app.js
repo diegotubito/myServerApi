@@ -1,4 +1,4 @@
 require('dotenv').config()
-const Server = require('./Model/server')
+const Server = require('./Module/server')
 const server = new Server()
 server.connect()
