@@ -2,19 +2,19 @@ const axios = require("axios")
 
 class PaymentService {
 
-    async createPayment() {
+    async createPayment(body) {
         const url = "https://api.mercadopago.com/checkout/preferences";
 
-        const body = {
-            payer_email: "test_user_1270583015@testuser.com", // aca va mi email comprador
+        const mpBody = {
+            payer_email: body.payer_email, // aca va mi email comprador
             items: [
                 {
-                    title: "Dummy Title",
-                    description: "Dymmy description",
-                    picture_utl: "http://www.myapp.com/myimage.jpg",
+                    title: body.title,
+                    description: body.description,
+                    picture_url: body.picture_url,
                     category_id: "category123",
-                    quantity: 1,
-                    unit_price: 10
+                    quantity: body.quantity,
+                    unit_price: body.unit_price
                 }
             ],
             back_urls: {
@@ -24,7 +24,7 @@ class PaymentService {
             }
         }
 
-        const payment = await axios.post(url, body, {
+        const payment = await axios.post(url, mpBody, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${process.env.ACCESS_TOKEN_MP}`
@@ -34,22 +34,22 @@ class PaymentService {
         return payment.data
     }
 
-    async createSubscription() {
+    async createSubscription(body) {
         const url = "https://api.mercadopago.com/preapproval"
 
-        const body = {
-            reason: "Suscripción de ejemplo",
+        const mpBody = {
+            reason: body.reason,
             auto_recurring: {
-                frequency: 1, 
+                frequency: body.frequency, 
                 frequency_type: "months",
                 transaction_amount: 10,
                 currency_id: "ARS"
             },
-            back_url: "https://google.com.ar",
-            payer_email: "test_user_1270583015@testuser.com" // va el email comprador
+            back_url: body.back_url,
+            payer_email: body.payer_email // va el email comprador
         }
 
-        const subscription = await axios.post(url, body, {
+        const subscription = await axios.post(url, mpBody, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `bearer ${process.env.ACCESS_TOKEN_MP}`

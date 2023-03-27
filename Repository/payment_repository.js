@@ -5,7 +5,7 @@ class PaymentController {
 
     async getPaymentLink(req, res) {
         try {
-            const payment = await this.subcriptionService.createPayment()
+            const payment = await this.subcriptionService.createPayment(req.body)
             return res.json(payment)
         } catch (error) {
             console.log(error)
@@ -18,14 +18,11 @@ class PaymentController {
 
     async getSubscriptionLink(req, res) {
         try {
-            const subcription = await this.subcriptionService.createSubscription()
+            const subcription = await this.subcriptionService.createSubscription(req.body)
             return res.json(subcription)
         } catch (error) {
             console.log(error)
-            return res.status(500).json({
-                error: true,
-                msg: "Failed to create subscription"
-            })
+            return res.status(500).json(error)
         }
     }
 }

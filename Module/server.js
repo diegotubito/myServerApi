@@ -22,7 +22,8 @@ class Server {
         this.app.use('', require('../Router/user_router'))
         this.app.use('/api/v1/auth', require('../Router/login_router'))
         this.app.use('/api/v1/stripe', require('../Router/stripe_route'))
-        this.app.use('/api/v1/mp', require('../Router/mp_router'))
+        this.app.use('/api/v1/mp', require('../Router/mp_link_router'))
+        this.app.use('/api/v1/mp/sdk', require('../Router/mp_sdk_router'))
     }
 
     connect() {
