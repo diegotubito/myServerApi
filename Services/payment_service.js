@@ -58,6 +58,19 @@ class PaymentService {
 
         return subscription.data
     }
+
+    async getPaymentMethods() {
+        const url = "https://api.mercadopago.com/v1/payment_methods"
+
+        const paymentMethods = await axios.get(url, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${process.env.ACCESS_TOKEN_MP}`
+            }
+        })
+
+        return paymentMethods.data
+    }
 }
 
 module.exports = PaymentService

@@ -25,6 +25,16 @@ class PaymentController {
             return res.status(500).json(error)
         }
     }
+
+    async getPaymentMethods(req, res) {
+        try {
+            const paymentMethods = await this.subcriptionService.getPaymentMethods()
+            return res.json(paymentMethods)
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json(error)
+        }
+    }
 }
 
 module.exports = PaymentController

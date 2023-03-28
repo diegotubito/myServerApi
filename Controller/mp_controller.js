@@ -12,4 +12,8 @@ const subscriptionLinkPost = (req, res = response) => {
     payment.getSubscriptionLink(req, res)
 }
 
-module.exports = { paymentLinkPost, subscriptionLinkPost }
+const paymentMethodGet = (req, res = response) => {
+    payment.getPaymentMethods(req, res)
+}
+
+module.exports = { paymentLinkPost, subscriptionLinkPost, paymentMethodGet }
