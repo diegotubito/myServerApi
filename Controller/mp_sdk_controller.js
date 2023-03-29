@@ -24,7 +24,7 @@ const paymentPost = async (req, res = response) => {
             pending: '',
         },
         payer: {
-            email: "diegodavid@icloud.com",
+            email: "diegodavid12@icloud.com",
             identification: {
                 type: 'DNI',
                 number: '123456789'
@@ -35,8 +35,8 @@ const paymentPost = async (req, res = response) => {
                 zip_code: "52"
             }
         },
-        auto_return: 'approved',
-        binary_mode: true, // pagos solo tarjeta
+  //      auto_return: 'approved',
+      //  binary_mode: true, // pagos solo tarjeta
     }
 
     try {
