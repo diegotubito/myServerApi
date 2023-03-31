@@ -1,16 +1,63 @@
 const {Schema, model} = require('mongoose')
 
+
+const PointSchema = new Schema({
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    },
+    street : {
+        type : String,
+        required: [true, 'Street is required'],
+    },
+    streetNumber: {
+        type: Number,
+        require: [true, 'Street number is required']
+    },
+    cp: {
+        type : String,
+    }, 
+    locality: {
+        type : String,
+    },
+    state : {
+        type : String,
+    },
+    country : {
+        type : String,
+    }
+});
+
 const UserSchema = Schema({
-    displayName: {
+    username: {
         type: String,
-        required: true
+        unique: [true, 'username must be unique'],
+        required: [true, 'username field is required']
     },
     email: {
         type: String,
-        required: true
+        unique: [true, 'email must be unique'],
+        required: [true, 'email field is required']
     },
     password: {
         type: String,
+        require: [true, 'password field is required']
+    },
+    firstName : {
+        type : String, 
+        required : [true, 'firstName field is required.']
+    },
+    lastName : {
+        type : String, 
+        required : [true, 'lastname field is required.']
+    },
+    thumbnailImage : {
+        type : String
     },
     createdAt: {
         type: Date,
@@ -23,6 +70,12 @@ const UserSchema = Schema({
     role: {
         type: String,
         default: "USER_ROLE"
+    },
+    location: {
+        type: PointSchema
+    },
+    phoneNumber : {
+        type: String
     }
 })
 
