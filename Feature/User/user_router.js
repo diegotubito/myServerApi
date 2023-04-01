@@ -50,7 +50,7 @@ router.put('/user/activate/:_id', [
     validateRole('SUPER_ROLE', 'ADMIN_ROLE')
 ], userActivate)
 
-router.get('/near-user', [
+router.post('/near-user', [
     validateToken,
     validateRole('ALL')
 ], userNear)

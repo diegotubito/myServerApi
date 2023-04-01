@@ -20,6 +20,8 @@ class Server {
 
     #router() {
         this.app.use('', require('../Feature/User/user_router'))
+        this.app.use('', require('../Feature/Product/product_routes'))
+
         this.app.use('/api/v1/auth', require('../Feature/Login/login_router'))
         this.app.use('/api/v1/stripe', require('../Feature/Stripe/stripe_route'))
         this.app.use('/api/v1/mp', require('../Feature/MercadoPago/mp_link_router'))
