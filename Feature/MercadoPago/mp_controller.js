@@ -1,6 +1,6 @@
 
-const PaymentService = require('../Services/payment_service')
-const PaymentController = require('../Repository/payment_repository')
+const PaymentService = require('../../Services/payment_service')
+const PaymentController = require('./payment_repository')
 const { response } = require('express')
 const payment = new PaymentController( new PaymentService() )
 

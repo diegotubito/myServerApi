@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const router = Router()
-const { paymentLinkPost, subscriptionLinkPost, paymentMethodGet } = require('../Controller/mp_controller')
+const { paymentLinkPost, subscriptionLinkPost, paymentMethodGet } = require('./mp_controller')
 
 router.post('/payment', paymentLinkPost)
 router.post('/subscription', subscriptionLinkPost)

@@ -19,11 +19,11 @@ class Server {
     }
 
     #router() {
-        this.app.use('', require('../Router/user_router'))
-        this.app.use('/api/v1/auth', require('../Router/login_router'))
-        this.app.use('/api/v1/stripe', require('../Router/stripe_route'))
-        this.app.use('/api/v1/mp', require('../Router/mp_link_router'))
-        this.app.use('/api/v1/mp/sdk', require('../Router/mp_sdk_router'))
+        this.app.use('', require('../Feature/User/user_router'))
+        this.app.use('/api/v1/auth', require('../Feature/Login/login_router'))
+        this.app.use('/api/v1/stripe', require('../Feature/Stripe/stripe_route'))
+        this.app.use('/api/v1/mp', require('../Feature/MercadoPago/mp_link_router'))
+        this.app.use('/api/v1/mp/sdk', require('../Feature/MercadoPago/mp_sdk_router'))
     }
 
     connect() {

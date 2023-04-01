@@ -1,5 +1,5 @@
 const { response } = require("express");
-const Role = require('../../Model/role_model')
+const Role = require('../../Feature/Role/role_model')
 
 const validateExistingRole = async (role = '') => {
     const query = {
