@@ -25,7 +25,7 @@ const userGet = async (req, res = response) => {
 }
 
 const userPost = async (req, res = response) => {
-    const {createdAt, ...body} = req.body
+    const {createdAt, emailVerified, ...body} = req.body
 
     //setup password
     const saltRounds = 10

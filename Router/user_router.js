@@ -6,9 +6,12 @@ const checkValidationResult = require('../Middleware/Error/validation_error')
 const checkUniqueEmail = require('../Middleware/Error/validation_unique_email')
 const validateToken = require('../Middleware/Error/validate_token')
 const validateUniqueUsername = require('../Middleware/Error/validate_unique_username')
+const validateRole = require('../Middleware/Error/validate_role')
 
-router.get('/user', userGet)
+router.get('/user',[validateToken, validateRole('SUPER_ROLE')], userGet)
 router.post('/user', [
+    validateToken,
+    validateRole('SUPER_ROLE', 'OWNER_ROLE'),
     check('username', 'username is too short or too long').isLength({min: 2, max: 30}),
     check('email', 'Email format is invalid').isEmail(),
     check('password', 'Password format is wrong').isLength({min:4}),

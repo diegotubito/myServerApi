@@ -1,6 +1,5 @@
 const {Schema, model} = require('mongoose')
 
-
 const PointSchema = new Schema({
     type: {
       type: String,
@@ -69,13 +68,17 @@ const UserSchema = Schema({
     },
     role: {
         type: String,
-        default: "USER_ROLE"
+        required: [true, 'User role is required']
     },
     location: {
         type: PointSchema
     },
     phoneNumber : {
         type: String
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false
     }
 })
 
