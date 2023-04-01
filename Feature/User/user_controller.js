@@ -57,13 +57,61 @@ const userUpdate = async (req, res = response) => {
     const body = req.body
     const id = req.params._id
 
-    const { email, createdAt, _id, password, ... filterBody } = body
+    const { email,
+         createdAt,
+          _id,
+          password,
+           username,
+           isEnabled,
+            role,
+             emailVerified, ... filterBody } = body
+
+    const options = {
+        new: true, // return new document instead of previous one.
+    }
+
     try {
-        const updated = await User.updateOne({_id: id}, filterBody)
+        const updated = await User.findByIdAndUpdate(id, filterBody, options)
         res.json(updated)
     } catch (error) {
         res.status(500).json(error)
     }
 }
 
-module.exports = { userGet, userPost, userUpdate, userDelete }
+const userDeactivate = async (req, res = response) => {
+    const _id = req.params._id
+    const query = {
+        isEnabled: false
+    }
+
+    const options = {
+        new: true, // return new document instead of previous one.
+    }
+
+    try {
+        const userUpdated = await User.findByIdAndUpdate(_id, query, options)
+        res.json(userUpdated)
+    } catch (error) {
+        res.status(500).json(error)        
+    }
+}
+
+const userActivate = async (req, res = response) => {
+    const _id = req.params._id
+    const query = {
+        isEnabled: true
+    }
+
+    const options = {
+        new: true, // return new document instead of previous one.
+    }
+
+    try {
+        const userUpdated = await User.findByIdAndUpdate(_id, query, options)
+        res.json(userUpdated)
+    } catch (error) {
+        res.status(500).json(error)        
+    }
+}
+
+module.exports = { userGet, userPost, userUpdate, userDelete, userDeactivate, userActivate }
