@@ -114,4 +114,39 @@ const userActivate = async (req, res = response) => {
     }
 }
 
-module.exports = { userGet, userPost, userUpdate, userDelete, userDeactivate, userActivate }
+const userNear = async (req, res = response) => {
+    const longitude = Number(req.body.longitude)
+    const latitude = Number(req.body.latitude)
+    const distance = Number(req.body.distance)
+
+    if (!longitude || !latitude || !distance) {
+        return res.status(400).json('request error')
+    }
+
+    const coordinates = [ longitude, latitude ];
+   
+    const query = {
+        location: {
+            $near: {
+                $geometry: {
+                    type: 'Point',
+                    coordinates: coordinates
+                },
+                $maxDistance: distance
+            }
+        }
+    };
+
+    // counts doesn't work with this kind or $near query
+    try {
+        const nearUsers = await User.find(query)
+        res.json({
+            users: nearUsers
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json(error)    
+    }
+}
+
+module.exports = { userGet, userPost, userUpdate, userDelete, userDeactivate, userActivate, userNear }

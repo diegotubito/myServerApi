@@ -82,6 +82,8 @@ const UserSchema = Schema({
     }
 })
 
+UserSchema.index({ location: "2dsphere" });
+
 // Overriding toJSON method
 // This is used for deleting some parameters we don't want to show in any response.
 // I am hidding __v and password property
