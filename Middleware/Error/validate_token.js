@@ -15,9 +15,7 @@ const validateToken = async (req = request, res = response, next) => {
         }
 
         try {
-            console.log(decoded._id)
             const user = await User.findOne({_id: decoded._id})
-            console.log(user)
             if (!user.isEnabled) {
                 return res.status(401).json('invalid token user not enabled')
             }

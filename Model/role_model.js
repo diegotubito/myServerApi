@@ -1,6 +1,6 @@
 const {Schema, model} = require('mongoose')
 
-const RoleSchema = Schema({
+const RoleSchema = new Schema({
     role: {
         type: String,
         unique: [true, 'role must be unique']
