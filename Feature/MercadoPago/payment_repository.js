@@ -10,8 +10,7 @@ class PaymentController {
         } catch (error) {
             console.log(error)
             return res.status(500).json({
-                error: true,
-                msg: "Failed to create payment"
+                message: error.message
             })
         }
     }
@@ -22,7 +21,9 @@ class PaymentController {
             return res.json(subcription)
         } catch (error) {
             console.log(error)
-            return res.status(500).json(error)
+            return res.status(500).json({
+                message: error.message
+            })
         }
     }
 
@@ -32,7 +33,9 @@ class PaymentController {
             return res.json(paymentMethods)
         } catch (error) {
             console.log(error)
-            return res.status(500).json(error)
+            return res.status(500).json({
+                message: error.message
+            })
         }
     }
 }

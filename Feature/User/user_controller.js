@@ -20,7 +20,10 @@ const userGet = async (req, res = response) => {
        
         res.json({count, users})        
     } catch (error) {
-        res.status(500).json(error)
+        console.log(error)
+        return res.status(500).json({
+            message: error.message
+        })
     }
 }
 
@@ -38,7 +41,9 @@ const userPost = async (req, res = response) => {
         const newUser = await user.save()
         res.json(newUser)
     } catch (error) {
-        res.status(500).json(error)
+        return res.status(500).json({
+            message: error.message
+        })
     }
 }
 
@@ -49,7 +54,9 @@ const userDelete = async (req, res = response) => {
         const user = await User.deleteOne({_id})
         res.json(user)        
     } catch (error) {
-        res.status(500).json(error)
+        return res.status(500).json({
+            message: error.message
+        })
     }
 }
 
@@ -74,7 +81,9 @@ const userUpdate = async (req, res = response) => {
         const updated = await User.findByIdAndUpdate(id, filterBody, options)
         res.json(updated)
     } catch (error) {
-        res.status(500).json(error)
+        return res.status(500).json({
+            message: error.message
+        })
     }
 }
 
@@ -92,7 +101,9 @@ const userDeactivate = async (req, res = response) => {
         const userUpdated = await User.findByIdAndUpdate(_id, query, options)
         res.json(userUpdated)
     } catch (error) {
-        res.status(500).json(error)        
+        return res.status(500).json({
+            message: error.message
+        })    
     }
 }
 
@@ -110,22 +121,24 @@ const userActivate = async (req, res = response) => {
         const userUpdated = await User.findByIdAndUpdate(_id, query, options)
         res.json(userUpdated)
     } catch (error) {
-        res.status(500).json(error)        
+        return res.status(500).json({
+            message: error.message
+        })   
     }
 }
 
 const userNear = async (req, res = response) => {
-    const longitude = Number(req.body.longitude)
-    const latitude = Number(req.body.latitude)
+    const coordinates = req.body.coordinates
     const distance = Number(req.body.distance)
 
-    if (!longitude || !latitude || !distance) {
-        return res.status(400).json('request error')
+    if (!coordinates || !distance) {
+        return res.status(400).json({
+            message: 'request error'
+        }) 
     }
-
-    const coordinates = [ longitude, latitude ];
    
     const query = {
+        isEnabled: true,
         location: {
             $near: {
                 $geometry: {
@@ -142,10 +155,11 @@ const userNear = async (req, res = response) => {
         const nearUsers = await User.find(query)
         res.json({
             users: nearUsers
-        })
+        });
     } catch (error) {
-        console.log(error)
-        res.status(500).json(error)    
+        return res.status(500).json({
+            message: error.message
+        }) 
     }
 }
 

@@ -7,14 +7,24 @@ const loginPost = async (req, res = response) => {
     const {email, password} = req.body
 
     try {
-        const user = await User.findOne({email, isEnabled: true})
+        const user = await User.findOne({email})
         if (!user) {
-            return res.status(400).json('user does not exist')
+            return res.status(400).json({
+                message: 'user does not exist.'
+            })
+        }
+
+        if (!user.isEnabled) {
+            return res.status(400).json({
+                message: 'user deactivated.'
+            })
         }
 
         const isValid = bcrypt.compareSync(password, user.password)
         if (!isValid) {
-            return res.status(400).json('password incorrect')
+            return res.status(400).json({
+                message: 'incorrect password.'
+            })
         }
 
         const {_id} = user
@@ -25,7 +35,9 @@ const loginPost = async (req, res = response) => {
             token
         })    
     } catch (error) {
-        res.status(500).json(error)
+        return res.status(500).json({
+            message: error.message
+        })
     }
 }
 
