@@ -1,10 +1,13 @@
 const { Schema, model } = require('mongoose')
 
 const ProductSchema = new Schema({
-    name: {
+    title: {
         type: String,
         required: true
     },
+    subtitle: {
+        type: String
+    },    
     type: {
         type: String,
         required: true
@@ -34,5 +37,7 @@ const ProductSchema = new Schema({
         default: Date.now
     }
 })
+
+ProductSchema.index({ spot: "2dsphere"});
 
 module.exports = model('product', ProductSchema)

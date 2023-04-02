@@ -3,7 +3,7 @@ const { productCreate, productGet, productUpdate, productDelete } = require('./p
 const router = Router()
 
 router.post('/product', productCreate)
-router.get('/product/:spotId', productGet)
+router.get('/product', productGet)
 router.put('/product/:id', productUpdate)
 router.delete('/product/:id', productDelete)
 

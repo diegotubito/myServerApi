@@ -6,8 +6,18 @@ const getSpot = async (req, res = response) => {
         const filter = {
             isEnabled: true
         }
+
+        const productsFilter = { 
+            isEnabled: true,
+            type: req.query.filterProductsByType
+        }
+
         const [spots, count] = await Promise.all([
-            Spot.find(filter),
+            Spot.find(filter)
+            .populate({
+                path: 'products',
+                match: productsFilter
+            }),
             Spot.countDocuments(filter)
         ])
        
@@ -130,9 +140,18 @@ const getNearSpot = async (req, res = response) => {
         }
     };
 
+    const productsFilter = { 
+        isEnabled: true,
+        type: req.query.filterProductsByType
+    }
+
     // counts doesn't work with this kind or $near query
     try {
         const nearSpots = await Spot.find(query)
+        .populate({
+            path: 'products',
+            match: productsFilter
+        })
         res.json({
             spots: nearSpots
         });

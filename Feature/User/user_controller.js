@@ -1,5 +1,6 @@
 const { response } = require("express")
 const User = require('./user_model')
+const Spot = require('../Spot/spot_model')
 const bcrypt = require('bcrypt')
 
 const userGet = async (req, res = response) => {
@@ -53,6 +54,11 @@ const userDelete = async (req, res = response) => {
     
     try {
         const user = await User.findByIdAndDelete(_id)
+        if (!user) {
+            return res.status(400).json({
+                message: 'could not delete'
+            })
+        }
         res.json(user)        
     } catch (error) {
         return res.status(500).json({
@@ -81,6 +87,11 @@ const userUpdate = async (req, res = response) => {
 
     try {
         const updated = await User.findByIdAndUpdate(id, filterBody, options)
+        if (!updated) {
+            return res.status(400).json({
+                message: 'could not update'
+            })
+        }
         res.json(updated)
     } catch (error) {
         return res.status(500).json({
@@ -101,6 +112,11 @@ const userDeactivate = async (req, res = response) => {
 
     try {
         const userUpdated = await User.findByIdAndUpdate(_id, query, options)
+        if (!userUpdated) {
+            return res.status(400).json({
+                message: 'could not deactivate'
+            })
+        }
         res.json(userUpdated)
     } catch (error) {
         return res.status(500).json({
@@ -121,6 +137,11 @@ const userActivate = async (req, res = response) => {
 
     try {
         const userUpdated = await User.findByIdAndUpdate(_id, query, options)
+        if (!userUpdated) {
+            return res.status(400).json({
+                message: 'could not activate'
+            })
+        }
         res.json(userUpdated)
     } catch (error) {
         return res.status(500).json({
@@ -143,6 +164,12 @@ const asignSpotToUser = async (req, res = response) => {
 
     try {
         const userUpdated = await User.findByIdAndUpdate(_id, changes, options)
+        if (!userUpdated) {
+            return res.status(400).json({
+                message: 'could not update'
+            })
+        }
+
         res.json(userUpdated)
     } catch (error) {
         return res.status(500).json({
@@ -164,6 +191,11 @@ const removeSpotToUser = async (req, res = response) => {
 
     try {
         const userUpdated = await User.findByIdAndUpdate(_id, changes, options)
+        if (!userUpdated) {
+            return res.status(400).json({
+                message: 'could not update'
+            })
+        }
         res.json(userUpdated)
     } catch (error) {
         return res.status(500).json({

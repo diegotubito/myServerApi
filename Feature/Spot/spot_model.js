@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose')
+const { Schema, model, SchemaType } = require('mongoose')
 
 
 const PointSchema = new Schema({
@@ -68,7 +68,11 @@ const SpotSchema = new Schema({
     isEnabled: {
         type: Boolean,
         default: true
-    }
+    },
+    products: [{
+        type: Schema.Types.ObjectId,
+        ref: 'product'
+    }]
 })
 
 SpotSchema.index({ location: "2dsphere" });

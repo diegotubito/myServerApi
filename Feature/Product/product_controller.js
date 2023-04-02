@@ -1,10 +1,11 @@
 const { response } = require("express")
 const Product = require('./product_model')
+const Spot = require('../Spot/spot_model')
 
 const productCreate = async (req, res = response) => {
     const body = req.body
     if (!body) {
-        res.status(400).json({
+        return res.status(400).json({
             message: 'request body needed'
         })
     }
@@ -13,6 +14,17 @@ const productCreate = async (req, res = response) => {
 
     try {
         await newProduct.save()
+        
+        //push a the new product to Spot document
+        const spotDocument = await Spot.findById(body.spot)
+        if (!spotDocument) {
+            return res.status(400).json({
+                message: 'spot does not exist'
+            })
+        }
+        spotDocument.products.push(newProduct)
+        await spotDocument.save()
+
         res.json({
             user: newProduct
         })
@@ -24,15 +36,17 @@ const productCreate = async (req, res = response) => {
 }
 
 const productGet = async (req, res = response) => {
-    const query = {
-        isEnabled: true,
-        spot: req.params.spotId
-    }
+    const { spotId } = req.query
 
+    const filter = {
+        isEnabled: true,
+        spot: spotId
+    }
+   
     try {
         const [ products, count ] = await Promise.all([
-            Product.find(query),
-            Product.countDocuments(query)
+            Product.find(filter),
+            Product.countDocuments(filter)
         ])
         
         res.json({
@@ -57,6 +71,11 @@ const productUpdate = async (req, res = response) => {
 
     try {
         const productUpdated = await Product.findByIdAndUpdate(id, updates, options)
+        if (!productUpdated) {
+            return res.status(400).json({
+                message: 'could not update product'
+            })
+        }
         res.json(productUpdated)
     } catch (error) {
         res.status(500).json({
@@ -68,8 +87,17 @@ const productUpdate = async (req, res = response) => {
 const productDelete = async (req, res = response) => {
     const id = req.params.id
 
+    const options = {
+        new: true
+    }
+
     try {
-        const deletedProduct = await Product.findByIdAndDelete(id)
+        const deletedProduct = await Product.findByIdAndDelete(id, options)
+        if (!deletedProduct) {
+            return res.status(400).json({
+                message: 'could not delete product'
+            })
+        }
         res.json(deletedProduct)
     } catch (error) {
         res.status(500).json({
