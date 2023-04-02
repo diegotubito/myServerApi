@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const router = Router()
-const {userGet, userPost, userUpdate, userDelete, userDeactivate, userActivate, userNear} = require('./user_controller')
+const {userGet, userPost, userUpdate, userDelete, userDeactivate, userActivate, asignSpotToUser, removeSpotToUser } = require('./user_controller')
 const {check} = require('express-validator')
 const checkValidationResult = require('../../Middleware/Error/validation_error')
 const checkUniqueEmail = require('../../Middleware/Validation/validation_unique_email')
@@ -50,9 +50,7 @@ router.put('/user/activate/:_id', [
     validateRole('SUPER_ROLE', 'ADMIN_ROLE')
 ], userActivate)
 
-router.post('/near-user', [
-    validateToken,
-    validateRole('ALL')
-], userNear)
+router.put('/user/asign-spot/:_id', asignSpotToUser)
+router.put('/user/remove-spot/:_id', removeSpotToUser)
 
 module.exports = router

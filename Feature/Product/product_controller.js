@@ -26,14 +26,17 @@ const productCreate = async (req, res = response) => {
 const productGet = async (req, res = response) => {
     const query = {
         isEnabled: true,
-        user: req.params.userId
+        spot: req.params.spotId
     }
 
     try {
-        const products = await Product.find(query)
-        .populate('user')
+        const [ products, count ] = await Promise.all([
+            Product.find(query),
+            Product.countDocuments(query)
+        ])
+        
         res.json({
-            products
+            count, products
         })
     } catch (error) {
         res.status(500).json({

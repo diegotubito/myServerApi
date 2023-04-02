@@ -20,9 +20,9 @@ const ProductSchema = new Schema({
     capacity: {
         type: Number
     },
-    user: {
+    spot: {
         type: Schema.Types.ObjectId,
-        ref: "user",
+        ref: "spot",
         required: true
     },
     isEnabled: {

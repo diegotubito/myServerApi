@@ -14,7 +14,8 @@ const userGet = async (req, res = response) => {
             isEnabled: true
         }
         const [users, count] = await Promise.all([
-            User.find(filter),
+            User.find(filter)
+            .populate('spot'),
             User.countDocuments(filter)
         ])
        
@@ -65,6 +66,7 @@ const userUpdate = async (req, res = response) => {
     const id = req.params._id
 
     const { email,
+        spot,
          createdAt,
           _id,
           password,
@@ -127,40 +129,48 @@ const userActivate = async (req, res = response) => {
     }
 }
 
-const userNear = async (req, res = response) => {
-    const coordinates = req.body.coordinates
-    const distance = Number(req.body.distance)
+const asignSpotToUser = async (req, res = response) => {
+    const { _id } = req.params
+    const { spotId } = req.body
 
-    if (!coordinates || !distance) {
-        return res.status(400).json({
-            message: 'request error'
-        }) 
+    const changes = {
+        spot: spotId
     }
-   
-    const query = {
-        isEnabled: true,
-        location: {
-            $near: {
-                $geometry: {
-                    type: 'Point',
-                    coordinates: coordinates
-                },
-                $maxDistance: distance
-            }
-        }
-    };
 
-    // counts doesn't work with this kind or $near query
+    const options = {
+        new: true, // return new document instead of previous one.
+    }
+
     try {
-        const nearUsers = await User.find(query)
-        res.json({
-            users: nearUsers
-        });
+        const userUpdated = await User.findByIdAndUpdate(_id, changes, options)
+        res.json(userUpdated)
     } catch (error) {
         return res.status(500).json({
             message: error.message
-        }) 
+        })   
     }
 }
 
-module.exports = { userGet, userPost, userUpdate, userDelete, userDeactivate, userActivate, userNear }
+const removeSpotToUser = async (req, res = response) => {
+    const { _id } = req.params
+    
+    const changes = {
+        spot: null
+    }
+
+    const options = {
+        new: true, // return new document instead of previous one.
+    }
+
+    try {
+        const userUpdated = await User.findByIdAndUpdate(_id, changes, options)
+        res.json(userUpdated)
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })   
+    }
+}
+
+
+module.exports = { userGet, userPost, userUpdate, userDelete, userDeactivate, userActivate, removeSpotToUser, asignSpotToUser }

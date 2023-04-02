@@ -1,42 +1,14 @@
 const {Schema, model} = require('mongoose')
 
-const PointSchema = new Schema({
-    type: {
-      type: String,
-      enum: ['Point'],
-      required: true
-    },
-    coordinates: {
-      type: [Number],
-      required: true
-    },
-    street : {
-        type : String,
-        required: [true, 'Street is required'],
-    },
-    streetNumber: {
-        type: Number,
-        require: [true, 'Street number is required']
-    },
-    cp: {
-        type : String,
-    }, 
-    locality: {
-        type : String,
-    },
-    state : {
-        type : String,
-    },
-    country : {
-        type : String,
-    }
-});
-
 const UserSchema = Schema({
     username: {
         type: String,
         unique: [true, 'username must be unique'],
         required: [true, 'username field is required']
+    },
+    spot: {
+        type: Schema.Types.ObjectId,
+        ref: 'spot'
     },
     email: {
         type: String,
@@ -70,9 +42,6 @@ const UserSchema = Schema({
         type: String,
         required: [true, 'User role is required']
     },
-    location: {
-        type: PointSchema
-    },
     phoneNumber : {
         type: String
     },
@@ -82,12 +51,9 @@ const UserSchema = Schema({
     }
 })
 
-UserSchema.index({ location: "2dsphere" });
-
 // Overriding toJSON method
 // This is used for deleting some parameters we don't want to show in any response.
 // I am hidding __v and password property
-
 
 UserSchema.methods.toJSON = function() {
     const { __v, password, ...cleanUser } = this.toObject();
