@@ -45,7 +45,11 @@ const productGet = async (req, res = response) => {
    
     try {
         const [ products, count ] = await Promise.all([
-            Product.find(filter),
+            Product.find(filter)
+            .populate({
+                path: 'availabilities',
+                match: {isEnabled: true}
+            }),
             Product.countDocuments(filter)
         ])
         

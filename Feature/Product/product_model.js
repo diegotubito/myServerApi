@@ -35,7 +35,11 @@ const ProductSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    availabilities: [{
+        type: Schema.Types.ObjectId,
+        ref: 'availability'
+    }]
 })
 
 ProductSchema.index({ spot: "2dsphere"});
