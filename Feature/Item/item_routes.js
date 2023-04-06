@@ -1,5 +1,5 @@
 const {Router} = require('express')
-const { createItem, getItem, updateItem, deleteItem } = require('./item_controller')
+const { createItem, getItem, updateItem, deleteItem, getNearItems } = require('./item_controller')
 const router = Router()
 
 router.post('/item', createItem)

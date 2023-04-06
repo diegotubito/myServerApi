@@ -31,11 +31,7 @@ const ItemSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "spot",
         required: true
-    },
-    availabilities: [{
-        type: Schema.Types.ObjectId,
-        ref: 'availability'
-    }]
+    }
 }, {timestamps: true} )
 
 module.exports = model('item', ItemSchema)

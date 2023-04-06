@@ -26,7 +26,8 @@ const createAvailability = async (req, res = response) => {
 
     const availability = await Availability(newBody)
     try {
-       
+     
+        /*
         const item = await Item.findById(newBody.service)
         if (!item || item.itemType != 'service') {
             return res.status(400).json({
@@ -35,21 +36,16 @@ const createAvailability = async (req, res = response) => {
         }
         item.availabilities.push(availability)
         await item.save()
+*/
 
 
-
-        const overlap = await hasOverlappingAvailability(item._id, availability.dayOfWeek, parsedStartTime, parsedEndTime)
+        const overlap = await hasOverlappingAvailability(newBody.service, availability.dayOfWeek, parsedStartTime, parsedEndTime)
 
         if (overlap) {
             return res.status(400).json({
                 message: 'request error, overlapping'
             })
         }
-
-
-
-
-
 
         const newObject = await availability.save()
         res.json(newObject)

@@ -1,6 +1,7 @@
 const { response } = require("express")
 const Item = require('./item_model')
 const Spot = require('../Spot/spot_model')
+const mongoose = require('mongoose')
 
 const createItem = async (req, res = response) => {
     const body = req.body
@@ -12,19 +13,8 @@ const createItem = async (req, res = response) => {
 
     const newItem = new Item(body)
     try {
-        
-        //push a the new item to Spot document
-        const spotDocument = await Spot.findById(body.spot)
-        if (!spotDocument) {
-            return res.status(400).json({
-                message: 'spot does not exist'
-            })
-        }
-        spotDocument.items.push(newItem)
-      
         await newItem.save()
-        await spotDocument.save()
-
+   
         res.json({
             item: newItem
         })
@@ -40,16 +30,15 @@ const getItem = async (req, res = response) => {
 
     const filter = {
         isEnabled: true,
-        spot: spotId
     }
-   
+
+    if (spotId) {
+        filter.spot = spotId
+    }
+
     try {
         const [ items, count ] = await Promise.all([
-            Item.find(filter)
-            .populate({
-                path: 'availabilities',
-                match: {isEnabled: true}
-            }),
+            Item.find(filter),
             Item.countDocuments(filter)
         ])
         
@@ -110,4 +99,4 @@ const deleteItem = async (req, res = response) => {
     }
 }
 
-module.exports = { createItem, getItem, deleteItem, updateItem }
+module.exports = { createItem, getItem, deleteItem, updateItem}
