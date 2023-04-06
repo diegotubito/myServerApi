@@ -19,7 +19,7 @@ const getSpot = async (req, res = response) => {
         const [spots, count] = await Promise.all([
             Spot.find(filter)
             .populate({
-                path: 'products',
+                path: 'items',
                 match: productsFilter,
                 populate : {
                     path : 'availabilities',

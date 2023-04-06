@@ -20,7 +20,7 @@ class Server {
 
     #router() {
         this.app.use('', require('../Feature/User/user_router'))
-        this.app.use('', require('../Feature/Product/product_routes'))
+        this.app.use('', require('../Feature/Item/item_routes'))
         this.app.use('', require('../Feature/Spot/spot_routes'))
         this.app.use('', require('../Feature/Availability/availability.route'))
 

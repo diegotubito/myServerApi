@@ -1,6 +1,9 @@
 const { response } = require("express");
 const Availability = require('./availability_model')
-const Product = require('../Product/product_model')
+const Item = require('../Item/item_model')
+const { parseTime } = require('../../Common/date_helper')
+const { hasOverlappingAvailability } = require('./availability_helper')
+
 
 const createAvailability = async (req, res = response) => {
     const body = req.body
@@ -10,21 +13,48 @@ const createAvailability = async (req, res = response) => {
         })
     }
 
-    const availability = await Availability(body)
-    try {
-        const newObject = await availability.save()
+    const parsedStartTime = parseTime(body.startTime);
+    const parsedEndTime = parseTime(body.endTime);
 
-        const product = await Product.findById(body.product)
-        if (!product) {
+    const newBody = {
+        dayOfWeek: body.dayOfWeek,
+        startTime: parsedStartTime,
+        endTime: parsedEndTime,
+        priceAdjustmentPercentage: body.priceAdjustmentPercentage,
+        service: body.service
+    }
+
+    const availability = await Availability(newBody)
+    try {
+       
+        const item = await Item.findById(newBody.service)
+        if (!item || item.itemType != 'service') {
             return res.status(400).json({
-                message: 'product not found'
+                message: 'item not found or the item is not a service'
             })
         }
-        product.availabilities.push(newObject)
-        await product.save()
+        item.availabilities.push(availability)
+        await item.save()
 
+
+
+        const overlap = await hasOverlappingAvailability(item._id, availability.dayOfWeek, parsedStartTime, parsedEndTime)
+
+        if (overlap) {
+            return res.status(400).json({
+                message: 'request error, overlapping'
+            })
+        }
+
+
+
+
+
+
+        const newObject = await availability.save()
         res.json(newObject)
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             message: error.message
         })
@@ -32,10 +62,10 @@ const createAvailability = async (req, res = response) => {
 }
 
 const getAvailabilities = async (req, res = response) => {
-    const { productId } = req.query
+    const { serviceId } = req.query
 
     const filter = {
-        product: productId
+        service: serviceId
     }
 
     try {
@@ -57,7 +87,7 @@ const getAvailabilities = async (req, res = response) => {
 
 const updateAvailability = async (req, res = response) => {
     const id = req.params._id 
-    const {_id, product, isEnabled, ...body} = req.body
+    const {_id, service, isEnabled, ...body} = req.body
 
     const options = {
         new: true

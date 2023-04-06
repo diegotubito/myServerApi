@@ -1,47 +1,41 @@
 const { Schema, model } = require('mongoose')
 
-const ProductSchema = new Schema({
-    title: {
+const ItemSchema = new Schema({
+    name: {
         type: String,
         required: true
     },
-    subtitle: {
+    description: {
         type: String
     },    
-    type: {
+    itemType: {
         type: String,
+        enum: ['product', 'service'],
         required: true
     },
     price: {
         type: Number,
         required: true
     },
-    currency: {
-        type: String,
-        required: true
+    isEnabled: {
+        type: Boolean,
+        default: true
     },
-    capacity: {
-        type: Number
+    duration: {
+        type: Number,
+        required: function () {
+            return this.itemType === 'service';
+        },
     },
     spot: {
         type: Schema.Types.ObjectId,
         ref: "spot",
         required: true
     },
-    isEnabled: {
-        type: Boolean,
-        default: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
     availabilities: [{
         type: Schema.Types.ObjectId,
         ref: 'availability'
     }]
-})
+}, {timestamps: true} )
 
-ProductSchema.index({ spot: "2dsphere"});
-
-module.exports = model('product', ProductSchema)
+module.exports = model('item', ItemSchema)

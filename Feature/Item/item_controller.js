@@ -1,8 +1,8 @@
 const { response } = require("express")
-const Product = require('./product_model')
+const Item = require('./item_model')
 const Spot = require('../Spot/spot_model')
 
-const productCreate = async (req, res = response) => {
+const createItem = async (req, res = response) => {
     const body = req.body
     if (!body) {
         return res.status(400).json({
@@ -10,23 +10,23 @@ const productCreate = async (req, res = response) => {
         })
     }
 
-    const newProduct = new Product(body)
-
+    const newItem = new Item(body)
     try {
-        await newProduct.save()
         
-        //push a the new product to Spot document
+        //push a the new item to Spot document
         const spotDocument = await Spot.findById(body.spot)
         if (!spotDocument) {
             return res.status(400).json({
                 message: 'spot does not exist'
             })
         }
-        spotDocument.products.push(newProduct)
+        spotDocument.items.push(newItem)
+      
+        await newItem.save()
         await spotDocument.save()
 
         res.json({
-            user: newProduct
+            item: newItem
         })
     } catch (error) {
         res.status(500).json({
@@ -35,7 +35,7 @@ const productCreate = async (req, res = response) => {
     }
 }
 
-const productGet = async (req, res = response) => {
+const getItem = async (req, res = response) => {
     const { spotId } = req.query
 
     const filter = {
@@ -44,17 +44,17 @@ const productGet = async (req, res = response) => {
     }
    
     try {
-        const [ products, count ] = await Promise.all([
-            Product.find(filter)
+        const [ items, count ] = await Promise.all([
+            Item.find(filter)
             .populate({
                 path: 'availabilities',
                 match: {isEnabled: true}
             }),
-            Product.countDocuments(filter)
+            Item.countDocuments(filter)
         ])
         
         res.json({
-            count, products
+            count, items
         })
     } catch (error) {
         res.status(500).json({
@@ -63,24 +63,24 @@ const productGet = async (req, res = response) => {
     }
 }
 
-const productUpdate = async (req, res = response) => {
+const updateItem = async (req, res = response) => {
     const id = req.params.id
     const body = req.body
 
-    const {user, _id, createdAt, isEnabled, ... updates} = body
+    const {user, _id, isEnabled, ... updates} = body
 
     const options = {
         new: true
     }
 
     try {
-        const productUpdated = await Product.findByIdAndUpdate(id, updates, options)
-        if (!productUpdated) {
+        const updated = await Item.findByIdAndUpdate(id, updates, options)
+        if (!updated) {
             return res.status(400).json({
-                message: 'could not update product'
+                message: 'could not update item'
             })
         }
-        res.json(productUpdated)
+        res.json(updated)
     } catch (error) {
         res.status(500).json({
             message: error.message
@@ -88,7 +88,7 @@ const productUpdate = async (req, res = response) => {
     }
 }
 
-const productDelete = async (req, res = response) => {
+const deleteItem = async (req, res = response) => {
     const id = req.params.id
 
     const options = {
@@ -96,13 +96,13 @@ const productDelete = async (req, res = response) => {
     }
 
     try {
-        const deletedProduct = await Product.findByIdAndDelete(id, options)
-        if (!deletedProduct) {
+        const deleted = await Item.findByIdAndDelete(id, options)
+        if (!deleted) {
             return res.status(400).json({
-                message: 'could not delete product'
+                message: 'could not delete item'
             })
         }
-        res.json(deletedProduct)
+        res.json(deleted)
     } catch (error) {
         res.status(500).json({
             message: error.message
@@ -110,4 +110,4 @@ const productDelete = async (req, res = response) => {
     }
 }
 
-module.exports = { productCreate, productGet, productDelete, productUpdate }
+module.exports = { createItem, getItem, deleteItem, updateItem }

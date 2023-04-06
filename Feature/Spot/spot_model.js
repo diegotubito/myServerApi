@@ -44,12 +44,12 @@ const ContactInformationSchema = new Schema({
 })
 
 const SpotSchema = new Schema({
-    title: {
+    name: {
         type: String,
-        unique: [true, 'spot title must be unique'],
-        required: [true, 'spot field is required']
+        unique: [true, 'spot name must be unique'],
+        required: [true, 'spot name is required']
     },
-    subtitle: {
+    description: {
         type: String
     },
     thumbnailImage: {
@@ -58,10 +58,6 @@ const SpotSchema = new Schema({
     location: {
         type: PointSchema
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
     contactInformation: {
         type: ContactInformationSchema
     },
@@ -69,11 +65,11 @@ const SpotSchema = new Schema({
         type: Boolean,
         default: true
     },
-    products: [{
+    items: [{
         type: Schema.Types.ObjectId,
-        ref: 'product'
+        ref: 'item'
     }]
-})
+}, {timestamps: true})
 
 SpotSchema.index({ location: "2dsphere" });
 
