@@ -1,5 +1,6 @@
 const { response } = require("express")
 const Spot = require('./spot_model')
+const Tipo = require('./tipo_model')
 
 const getSpot = async (req, res = response) => {
     try {
@@ -35,6 +36,16 @@ const createSpot = async (req, res = response) => {
 
     const spot = Spot(body)
     try {
+        for (x = 0; x < body.spotType.length; x++) {
+            const name = body.spotType[x]
+            const tipoDocument = await Tipo.findOne({name})
+            if (!tipoDocument) {
+                return res.status(400).json('tipo list is incorrect')
+            }
+            
+            spot.tipos.push(tipoDocument)
+        }
+
         const newSpot = await spot.save()
         res.json(newSpot)
     } catch (error) {

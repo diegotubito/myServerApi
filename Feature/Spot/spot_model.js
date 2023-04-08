@@ -1,6 +1,5 @@
 const { Schema, model, SchemaType } = require('mongoose')
 
-
 const PointSchema = new Schema({
     type: {
       type: String,
@@ -65,9 +64,9 @@ const SpotSchema = new Schema({
         type: Boolean,
         default: true
     },
-    items: [{
+    tipos: [{
         type: Schema.Types.ObjectId,
-        ref: 'item'
+        ref: 'tipo'
     }]
 }, {timestamps: true})
 

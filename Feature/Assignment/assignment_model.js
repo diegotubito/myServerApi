@@ -13,7 +13,7 @@ const AssignmentSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'accepted', 'rejected', 'completed'],
+        enum: ['user-pending', 'owner-accepted', 'owner-rejected', 'user-scheduled', 'user-cancel'],
         default: 'pending'
     },
     startDateAndTime: {

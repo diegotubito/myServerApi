@@ -124,4 +124,109 @@ const updateAssignment = async (req, res = response) => {
     }
 }
 
-module.exports = { createAssignment, getAssignment, updateAssignment, deleteAssignment}
+const acceptAssignment = async (req, res = response) => {
+    const { _id } = req.params
+
+    if (!_id) {
+        return res.status(400).json('bad request: _id missging')
+    }
+
+    const options = {
+        new: true
+    }
+
+    const updateValues = {
+        status: 'owner_accepted'
+    }
+
+    try {
+        const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        res.json(updated)
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+const rejectAssignment = async (req, res = response) => {
+    const { _id } = req.params
+
+    if (!_id) {
+        return res.status(400).json('bad request: _id missging')
+    }
+
+    const options = {
+        new: true
+    }
+
+    const updateValues = {
+        status: 'owner_rejected'
+    }
+
+    try {
+        const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        res.json(updated)
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+const scheduleAssignment = async (req, res = response) => {
+    const { _id } = req.params
+
+    if (!_id) {
+        return res.status(400).json('bad request: _id missging')
+    }
+
+    const options = {
+        new: true
+    }
+
+    const updateValues = {
+        status: 'user_scheduled'
+    }
+
+    try {
+        const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        res.json(updated)
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+const cancelAssignment = async (req, res = response) => {
+    const { _id } = req.params
+
+    if (!_id) {
+        return res.status(400).json('bad request: _id missging')
+    }
+
+    const options = {
+        new: true
+    }
+
+    const updateValues = {
+        status: 'user_cancel'
+    }
+
+    try {
+        const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        res.json(updated)
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+module.exports = { createAssignment, getAssignment, updateAssignment, deleteAssignment,
+acceptAssignment, rejectAssignment, scheduleAssignment, cancelAssignment}
