@@ -159,7 +159,7 @@ const getNearSpot = async (req, res = response) => {
     // counts doesn't work with this kind or $near query
     try {
         const nearSpots = await Spot.find(query)
-        .populate()
+        .populate('tipos')
         res.json({
             spots: nearSpots
         });

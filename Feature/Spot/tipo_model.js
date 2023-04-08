@@ -2,7 +2,9 @@ const { Schema, model } = require('mongoose')
 
 const TipoSchema = new Schema({
     name: {
-        type: String
+        type: String,
+        required: true,
+        unique: true
     }
 })
 
