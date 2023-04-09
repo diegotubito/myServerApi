@@ -1,10 +1,14 @@
 const { Schema, model } = require('mongoose')
 
 const TipoSchema = new Schema({
-    title: {
+    type: {
         type: String,
-        required: true,
-        unique: true
+    },
+    icon: {
+        type: String,
+    },
+    tintColor: {
+        type: String,
     }
 })
 

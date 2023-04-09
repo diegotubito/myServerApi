@@ -37,8 +37,10 @@ const createSpot = async (req, res = response) => {
     const spot = Spot(body)
     try {
         for (x = 0; x < body.spotType.length; x++) {
-            const name = body.spotType[x]
-            const tipoDocument = await Tipo.findOne({name})
+            
+            const stringType = body.spotType[x]
+            const tipoDocument = await Tipo.findOne({type: stringType})
+            
             if (!tipoDocument) {
                 return res.status(400).json('tipo list is incorrect')
             }

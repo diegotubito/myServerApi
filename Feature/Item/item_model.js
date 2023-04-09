@@ -1,11 +1,11 @@
 const { Schema, model } = require('mongoose')
 
 const ItemSchema = new Schema({
-    name: {
+    title: {
         type: String,
         required: true
     },
-    description: {
+    subtitle: {
         type: String
     },    
     itemType: {
@@ -33,5 +33,10 @@ const ItemSchema = new Schema({
         required: true
     }
 }, {timestamps: true} )
+
+ItemSchema.methods.toJSON = function() {
+    const { __v, ...cleanItem } = this.toObject();
+    return cleanItem
+}
 
 module.exports = model('item', ItemSchema)
