@@ -43,12 +43,12 @@ const ContactInformationSchema = new Schema({
 })
 
 const SpotSchema = new Schema({
-    name: {
+    title: {
         type: String,
         unique: [true, 'spot name must be unique'],
         required: [true, 'spot name is required']
     },
-    description: {
+    subtitle: {
         type: String
     },
     thumbnailImage: {

@@ -32,14 +32,17 @@ const userGet = async (req, res = response) => {
 const userPost = async (req, res = response) => {
     const {createdAt, emailVerified, ...body} = req.body
 
-    //setup password
-    const saltRounds = 10
-    const salt = bcrypt.genSaltSync(saltRounds);
-    const hash = bcrypt.hashSync(body.password, salt);
-    body.password = hash
-  
-    const user = User(body)
+
+    
     try {
+        //setup password
+        const saltRounds = 10
+        const salt = await bcrypt.genSaltSync(saltRounds);
+        const hash = await bcrypt.hashSync(body.password, salt);
+        body.password = hash
+
+        const user = User(body)
+
         const newUser = await user.save()
         res.json(newUser)
     } catch (error) {

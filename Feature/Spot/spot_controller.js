@@ -18,7 +18,7 @@ const getSpot = async (req, res = response) => {
         }
 
         const [spots, count] = await Promise.all([
-            Spot.find(filter),
+            Spot.find(filter).populate('tipos'),
             Spot.countDocuments(filter)
         ])
        
