@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose')
+const ImageSchema = require('../Image/image_model')
 
 const ItemSchema = new Schema({
     title: {
@@ -31,7 +32,8 @@ const ItemSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "spot",
         required: true
-    }
+    },
+    images: [Schema.Types.Mixed]
 }, {timestamps: true} )
 
 ItemSchema.methods.toJSON = function() {

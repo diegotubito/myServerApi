@@ -1,5 +1,6 @@
 const { response } = require("express")
 const Item = require('./item_model')
+const Image = require('../Image/image_model')
 const Spot = require('../Spot/spot_model')
 const mongoose = require('mongoose')
 
@@ -11,12 +12,24 @@ const createItem = async (req, res = response) => {
         })
     }
 
-    const newItem = new Item(body)
     try {
-        await newItem.save()
-   
+        // Save images and get their _ids
+        const imageDocs = await Promise.all(body.images.map(img => {
+            const newImage = new Image(img);
+            return newImage.save().then(savedImage => savedImage);
+        }));
+
+        const { images, ...newBody } = body
+        
+        const newItem = new Item(newBody);
+
+        newItem.images = imageDocs
+
+        // Save the item
+        const savedItem = await newItem.save();
+
         res.json({
-            item: newItem
+            item: savedItem
         })
     } catch (error) {
         res.status(500).json({
@@ -38,7 +51,7 @@ const getItem = async (req, res = response) => {
 
     try {
         const [ items, count ] = await Promise.all([
-            Item.find(filter),
+            Item.find(filter).populate('images'),
             Item.countDocuments(filter)
         ])
         
