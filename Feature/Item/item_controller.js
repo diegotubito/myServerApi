@@ -99,6 +99,12 @@ const deleteItem = async (req, res = response) => {
 
     try {
         const deleted = await Item.findByIdAndDelete(id, options)
+
+        for(index=0; index < deleted.images.length; index++) {
+            const imageId = deleted.images[index]._id
+            await Image.findByIdAndDelete(imageId)
+        }
+
         if (!deleted) {
             return res.status(400).json({
                 message: 'could not delete item'
