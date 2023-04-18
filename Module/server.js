@@ -24,6 +24,7 @@ class Server {
         this.app.use('', require('../Feature/Spot/spot_routes'))
         this.app.use('', require('../Feature/Availability/availability.route'))
         this.app.use('', require('../Feature/Assignment/assignment_route'))
+        this.app.use('', require('../Feature/Image/image_route'))
 
         this.app.use('/api/v1/auth', require('../Feature/Login/login_router'))
         this.app.use('/api/v1/stripe', require('../Feature/Stripe/stripe_route'))
