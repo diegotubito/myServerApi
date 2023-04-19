@@ -1,6 +1,7 @@
 const { response } = require("express")
 const Spot = require('./spot_model')
 const Tipo = require('./tipo_model')
+const Image = require('../Image/image_model')
 
 const getSpot = async (req, res = response) => {
     try {
@@ -32,8 +33,9 @@ const getSpot = async (req, res = response) => {
 }
 
 const createSpot = async (req, res = response) => {
-    const {createdAt, ...body} = req.body
 
+    const imageArray = req.body.images
+    const {createdAt, images, ...body} = req.body
     const spot = Spot(body)
     try {
         for (x = 0; x < body.spotType.length; x++) {
@@ -46,6 +48,14 @@ const createSpot = async (req, res = response) => {
             }
             
             spot.tipos.push(tipoDocument)
+        }
+
+        for (x = 0; x < imageArray.length; x++) {
+            
+            const imageBody = imageArray[x]
+            const imageDocument = await Image(imageBody)
+                        
+            spot.images.push(imageDocument)
         }
 
         const newSpot = await spot.save()

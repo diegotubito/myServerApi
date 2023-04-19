@@ -51,9 +51,6 @@ const SpotSchema = new Schema({
     subtitle: {
         type: String
     },
-    thumbnailImage: {
-        type: String
-    },
     location: {
         type: PointSchema
     },
@@ -67,7 +64,14 @@ const SpotSchema = new Schema({
     tipos: [{
         type: Schema.Types.ObjectId,
         ref: 'tipo'
-    }]
+    }],
+    profileImage: {
+        type: String
+    },
+    thumbnailImage: {
+        type: String
+    },
+    images: [Schema.Types.Mixed]
 }, {timestamps: true})
 
 SpotSchema.index({ location: "2dsphere" });
