@@ -13,7 +13,7 @@ const createAssignment = async (req, res = response) => {
     }
 
     const dateString = body.startDateAndTime;
-    const formatPattern = 'MM/dd/yyyy\'T\'HH:mm';
+    const formatPattern = 'MM/dd/yyyy';
     const parsedDate = parse(dateString, formatPattern, new Date());
 
     const newBody = {
@@ -37,17 +37,22 @@ const createAssignment = async (req, res = response) => {
 }
 
 const getAssignment = async (req, res = response) => {
-    const { from, to, spotId, serviceId } = req.query
+    const { from, to, spotId } = req.query
 
-    const formatPattern = 'MM/dd/yyyy\'T\'HH:mm';
-    const fromParsed = parse(from, formatPattern, new Date());
-    const toParsed = parse(to, formatPattern, new Date());
-
-    if (!fromParsed || !toParsed) {
+    if (!from || !to || !spotId) {
         return res.status(400).json('bad request')
     }
 
+    const formatPattern = 'MM/dd/yyyy\'T\'HH:mm:ss';
+    const fromParsed = parse(from, formatPattern, new Date());
+    const toParsed = parse(to, formatPattern, new Date());
+
+    if (!fromParsed || !toParsed ) {
+        return res.status(400).json('bad date format')
+    }
+
     const query = {
+        spot: spotId,
         startDateAndTime: {
             $gte: fromParsed,
             $lte: toParsed
@@ -57,7 +62,8 @@ const getAssignment = async (req, res = response) => {
     try {
         const [assignments, count] = await Promise.all([
             await Assignment.find(query)
-            .populate('availability'),
+            .populate('availability')
+            .populate('user'),
             await Assignment.countDocuments(query)
         ])
 
@@ -66,7 +72,6 @@ const getAssignment = async (req, res = response) => {
             assignments
         })
     } catch (error) {
-         console.log(error)
         return res.status(500).json({
             message: error.message
         })
@@ -96,7 +101,7 @@ const updateAssignment = async (req, res = response) => {
     const id = req.params._id 
     const {_id, service, user, availability, spot, amount, ...body} = req.body
 
-    const formatPattern = 'MM/dd/yyyy\'T\'HH:mm';
+    const formatPattern = 'MM/dd/yyyy\'T\'HH:mm:ss';
     const startDateAndTimeParsed = parse(body.startDateAndTime, formatPattern, new Date());
 
     if (!startDateAndTimeParsed) {

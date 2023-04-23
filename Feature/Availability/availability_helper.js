@@ -3,7 +3,7 @@ const Availability = require('./availability_model')
 
 async function hasOverlappingAvailability(serviceId, dayOfWeek, newStartTime, newEndTime) {
     const overlappingAvailability = await Availability.findOne({
-    serviceId: serviceId,
+    service: serviceId,
     dayOfWeek: dayOfWeek,
     $or: [
     // Case 1: New availability is within an existing availability

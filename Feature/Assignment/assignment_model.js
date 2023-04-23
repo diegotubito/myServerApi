@@ -11,12 +11,17 @@ const AssignmentSchema = new Schema({
         ref: 'availability',
         required: true
     },
+    spot: {
+        type: Schema.Types.ObjectId,
+        ref: 'spot',
+        required: true
+    },
     status: {
         type: String,
         enum: ['user-pending', 'owner-accepted', 'owner-rejected', 'user-scheduled', 'user-cancel'],
         default: 'pending'
     },
-    startDateAndTime: {
+    startDate: {
         type: Date,
         required: true
     },
