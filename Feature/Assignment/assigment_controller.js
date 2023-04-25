@@ -21,6 +21,19 @@ const createAssignment = async (req, res = response) => {
         startDateAndTime: parsedDate
     }
 
+    const existingAssignment = await Assignment.findOne({
+        availability: newBody.availability,
+        startDate: newBody.startDate,
+        spot: newBody.spot,
+        status: 'user-scheduled'
+    });
+
+    if (existingAssignment) {
+        return res.status(400).json({
+            message: "An assignment with the same availability, startDate, and spot with scheduled status, already exists.",
+        });
+    }
+
     const assignment = Assignment(newBody)
     
     try {
@@ -141,11 +154,14 @@ const acceptAssignment = async (req, res = response) => {
     }
 
     const updateValues = {
-        status: 'owner_accepted'
+        status: 'owner-accepted'
     }
 
     try {
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        if (!updated) {
+            return res.status(400).json('bad request')
+        }
         res.json(updated)
 
     } catch (error) {
@@ -167,11 +183,14 @@ const rejectAssignment = async (req, res = response) => {
     }
 
     const updateValues = {
-        status: 'owner_rejected'
+        status: 'owner-rejected'
     }
 
     try {
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        if (!updated) {
+            return res.status(400).json('bad request')
+        }
         res.json(updated)
 
     } catch (error) {
@@ -193,11 +212,14 @@ const scheduleAssignment = async (req, res = response) => {
     }
 
     const updateValues = {
-        status: 'user_scheduled'
+        status: 'user-scheduled'
     }
 
     try {
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        if (!updated) {
+            return res.status(400).json('bad request')
+        }
         res.json(updated)
 
     } catch (error) {
@@ -219,11 +241,14 @@ const cancelAssignment = async (req, res = response) => {
     }
 
     const updateValues = {
-        status: 'user_cancel'
+        status: 'user-cancelled'
     }
 
     try {
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        if (!updated) {
+            return res.status(400).json('bad request')
+        }
         res.json(updated)
 
     } catch (error) {
