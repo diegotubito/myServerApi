@@ -3,8 +3,15 @@ const Assignment = require('./assignment_model')
 const User = require('../User/user_model')
 const Availability = require('../Availability/availability_model')
 const { parse } = require('date-fns');
+const {zonedTimeToUtc} = require('date-fns-tz')
 
 const mongoose = require('mongoose')
+
+function parseDateIgnoringTimeZone(dateString, formatPattern) {
+    const [month, day, year] = dateString.split('/');
+    const parsedDate = new Date(Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10)));
+    return parsedDate;
+  }
 
 const createAssignment = async (req, res = response) => {
     const body = req.body
@@ -14,7 +21,8 @@ const createAssignment = async (req, res = response) => {
 
     const dateString = body.startDate;
     const formatPattern = 'MM/dd/yyyy';
-    const parsedDate = parse(dateString, formatPattern, new Date());
+    const parsedDate = parseDateIgnoringTimeZone(dateString, formatPattern);
+
 
     const newBody = {
         ...body,
@@ -66,7 +74,7 @@ const getAssignment = async (req, res = response) => {
 
     const query = {
         spot: spotId,
-        startDateAndTime: {
+        startDate: {
             $gte: fromParsed,
             $lte: toParsed
         }
