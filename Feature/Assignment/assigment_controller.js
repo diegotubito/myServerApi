@@ -6,11 +6,14 @@ const { parse } = require('date-fns');
 
 const mongoose = require('mongoose')
 
-function parseDateIgnoringTimeZone(dateString, formatPattern) {
-    const [month, day, year] = dateString.split('-');
-    const parsedDate = new Date(Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10)));
+function parseDateIgnoringTimeZone(dateTimeString) {
+    const [datePart, timePart] = dateTimeString.split('T');
+    const [month, day, year] = datePart.split('/');
+    const [hour, minute, second] = timePart.split(':');
+    const parsedDate = new Date(Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10), parseInt(second, 10)));
+
     return parsedDate;
-  }
+}
 
 const createAssignment = async (req, res = response) => {
     const body = req.body
@@ -19,9 +22,7 @@ const createAssignment = async (req, res = response) => {
     }
 
     const dateString = body.startDate;
-    const formatPattern = 'MM-dd-yyyy';
-    const parsedDate = parseDateIgnoringTimeZone(dateString, formatPattern);
-
+    const parsedDate = parseDateIgnoringTimeZone(dateString);
 
     const newBody = {
         ...body,
@@ -63,9 +64,8 @@ const getAssignment = async (req, res = response) => {
         return res.status(400).json('bad request')
     }
 
-    const formatPattern = 'MM-dd-yyyy\'T\'HH:mm:ss';
-    const fromParsed = parseDateIgnoringTimeZone(from, formatPattern);
-    const toParsed = parseDateIgnoringTimeZone(to, formatPattern);
+    const fromParsed = parseDateIgnoringTimeZone(from);
+    const toParsed = parseDateIgnoringTimeZone(to);
 
     if (!fromParsed || !toParsed ) {
         return res.status(400).json('bad date format')
