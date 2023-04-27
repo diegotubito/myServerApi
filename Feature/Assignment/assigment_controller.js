@@ -6,11 +6,6 @@ const { parse } = require('date-fns');
 
 const mongoose = require('mongoose')
 
-function parseDateToUTC(dateString, formatPattern) {
-    const parsedDate = parse(dateString, formatPattern, new Date());
-    return new Date(parsedDate.getTime() + parsedDate.getTimezoneOffset() * 60 * 1000);
-}
-
 const createAssignment = async (req, res = response) => {
     const body = req.body
     if (!body) {
@@ -19,7 +14,7 @@ const createAssignment = async (req, res = response) => {
 
     const dateString = body.startDate;
     const formatPattern = 'MM/dd/yyyy';
-    const parsedDate = parseDateToUTC(dateString, formatPattern, new Date());
+    const parsedDate = parse(dateString, formatPattern, new Date());
 
     const newBody = {
         ...body,
