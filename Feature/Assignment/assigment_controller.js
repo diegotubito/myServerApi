@@ -12,13 +12,13 @@ const createAssignment = async (req, res = response) => {
         return res.status(400).json('bad request')
     }
 
-    const dateString = body.startDateAndTime;
+    const dateString = body.startDate;
     const formatPattern = 'MM/dd/yyyy';
     const parsedDate = parse(dateString, formatPattern, new Date());
 
     const newBody = {
         ...body,
-        startDateAndTime: parsedDate
+        startDate: parsedDate
     }
 
     const existingAssignment = await Assignment.findOne({
