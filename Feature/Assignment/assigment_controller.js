@@ -3,12 +3,11 @@ const Assignment = require('./assignment_model')
 const User = require('../User/user_model')
 const Availability = require('../Availability/availability_model')
 const { parse } = require('date-fns');
-const {zonedTimeToUtc} = require('date-fns-tz')
 
 const mongoose = require('mongoose')
 
 function parseDateIgnoringTimeZone(dateString, formatPattern) {
-    const [month, day, year] = dateString.split('/');
+    const [month, day, year] = dateString.split('-');
     const parsedDate = new Date(Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10)));
     return parsedDate;
   }
@@ -20,7 +19,7 @@ const createAssignment = async (req, res = response) => {
     }
 
     const dateString = body.startDate;
-    const formatPattern = 'MM/dd/yyyy';
+    const formatPattern = 'MM-dd-yyyy';
     const parsedDate = parseDateIgnoringTimeZone(dateString, formatPattern);
 
 
@@ -64,9 +63,9 @@ const getAssignment = async (req, res = response) => {
         return res.status(400).json('bad request')
     }
 
-    const formatPattern = 'MM/dd/yyyy\'T\'HH:mm:ss';
-    const fromParsed = parse(from, formatPattern, new Date());
-    const toParsed = parse(to, formatPattern, new Date());
+    const formatPattern = 'MM-dd-yyyy\'T\'HH:mm:ss';
+    const fromParsed = parseDateIgnoringTimeZone(from, formatPattern);
+    const toParsed = parseDateIgnoringTimeZone(to, formatPattern);
 
     if (!fromParsed || !toParsed ) {
         return res.status(400).json('bad date format')
@@ -122,8 +121,8 @@ const updateAssignment = async (req, res = response) => {
     const id = req.params._id 
     const {_id, service, user, availability, spot, amount, ...body} = req.body
 
-    const formatPattern = 'MM/dd/yyyy\'T\'HH:mm:ss';
-    const startDateAndTimeParsed = parse(body.startDateAndTime, formatPattern, new Date());
+    const formatPattern = 'MM-dd-yyyy\'T\'HH:mm:ss';
+    const startDateAndTimeParsed = parseDateIgnoringTimeZone(body.startDateAndTime, formatPattern);
 
     if (!startDateAndTimeParsed) {
         return res.status(400).json('bad request: date format')
