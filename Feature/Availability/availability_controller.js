@@ -1,7 +1,7 @@
 const { response } = require("express");
 const Availability = require('./availability_model')
 const Item = require('../Item/item_model')
-const { parseTime } = require('../../Common/date_helper')
+const { parseDateIgnoringTimeZone, parseTime } = require('../../Common/date_helper')
 const { hasOverlappingAvailability } = require('./availability_helper')
 
 
@@ -12,9 +12,16 @@ const createAvailability = async (req, res = response) => {
             message: 'request error'
         })
     }
+    /*
+    const startTime = `01/01/2001T${body.startTime}` 
+    const endTime = `01/01/2001T${body.endTime}` 
+    const parsedStartTime = parseDateIgnoringTimeZone(startTime);
+    const parsedEndTime = parseDateIgnoringTimeZone(endTime);
+*/
 
     const parsedStartTime = parseTime(body.startTime);
     const parsedEndTime = parseTime(body.endTime);
+
 
     const newBody = {
         dayOfWeek: body.dayOfWeek,

@@ -3,17 +3,9 @@ const Assignment = require('./assignment_model')
 const User = require('../User/user_model')
 const Availability = require('../Availability/availability_model')
 const { parse } = require('date-fns');
+const { parseDateIgnoringTimeZone } = require('../../Common/date_helper')
 
 const mongoose = require('mongoose')
-
-function parseDateIgnoringTimeZone(dateTimeString) {
-    const [datePart, timePart] = dateTimeString.split('T');
-    const [month, day, year] = datePart.split('/');
-    const [hour, minute, second] = timePart.split(':');
-    const parsedDate = new Date(Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10), parseInt(second, 10)));
-
-    return parsedDate;
-}
 
 const createAssignment = async (req, res = response) => {
     const body = req.body
@@ -23,6 +15,15 @@ const createAssignment = async (req, res = response) => {
 
     const dateString = body.startDate;
     const parsedDate = parseDateIgnoringTimeZone(dateString);
+
+    // Get the timestamp for the start of today (midnight)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTimestamp = today.getTime();
+
+    if (parsedDate.getTime() < todayTimestamp) {
+        return res.status(400).json('Bad request. Date must not be greater than today.');
+    }
 
     const newBody = {
         ...body,
@@ -43,7 +44,7 @@ const createAssignment = async (req, res = response) => {
     }
 
     const assignment = Assignment(newBody)
-    
+
     try {
         const newAssignment = await assignment.save()
         res.json({
@@ -67,7 +68,7 @@ const getAssignment = async (req, res = response) => {
     const fromParsed = parseDateIgnoringTimeZone(from);
     const toParsed = parseDateIgnoringTimeZone(to);
 
-    if (!fromParsed || !toParsed ) {
+    if (!fromParsed || !toParsed) {
         return res.status(400).json('bad date format')
     }
 
@@ -82,8 +83,8 @@ const getAssignment = async (req, res = response) => {
     try {
         const [assignments, count] = await Promise.all([
             await Assignment.find(query)
-            .populate('availability')
-            .populate('user'),
+                .populate('availability')
+                .populate('user'),
             await Assignment.countDocuments(query)
         ])
 
@@ -99,27 +100,27 @@ const getAssignment = async (req, res = response) => {
 }
 
 const deleteAssignment = async (req, res = response) => {
-    const {_id} = req.params
+    const { _id } = req.params
 
     try {
         const deletedDocument = await Assignment.findByIdAndDelete(_id)
         if (!deletedDocument) {
             return res.status(400).json({
                 message: 'could not delete assignment'
-            }) 
+            })
         }
         res.json(deletedDocument)
-        
+
     } catch (error) {
         return res.status(500).json({
             message: error.message
-        })          
+        })
     }
 }
 
 const updateAssignment = async (req, res = response) => {
-    const id = req.params._id 
-    const {_id, service, user, availability, spot, amount, ...body} = req.body
+    const id = req.params._id
+    const { _id, service, user, availability, spot, amount, ...body } = req.body
 
     const formatPattern = 'MM-dd-yyyy\'T\'HH:mm:ss';
     const startDateAndTimeParsed = parseDateIgnoringTimeZone(body.startDateAndTime, formatPattern);
@@ -139,13 +140,13 @@ const updateAssignment = async (req, res = response) => {
         if (!updatedDocument) {
             return res.status(400).json({
                 message: 'could not update assignment'
-            }) 
+            })
         }
         res.json(updatedDocument)
     } catch (error) {
         return res.status(500).json({
             message: error.message
-        })  
+        })
     }
 }
 
@@ -265,5 +266,7 @@ const cancelAssignment = async (req, res = response) => {
     }
 }
 
-module.exports = { createAssignment, getAssignment, updateAssignment, deleteAssignment,
-acceptAssignment, rejectAssignment, scheduleAssignment, cancelAssignment}
+module.exports = {
+    createAssignment, getAssignment, updateAssignment, deleteAssignment,
+    acceptAssignment, rejectAssignment, scheduleAssignment, cancelAssignment
+}
