@@ -6,13 +6,15 @@ const { createAssignment,
         acceptAssignment,
          rejectAssignment,
           scheduleAssignment,
-           cancelAssignment} = require('./assigment_controller')
+           cancelAssignment, 
+           deleteAllAssignment} = require('./assigment_controller')
 const router = Router()
 
 router.post('/assignment', createAssignment)
 router.get('/assignment', getAssignment)
 router.put('/assignment/:_id', updateAssignment)
 router.delete('/assignment/:_id', deleteAssignment)
+router.delete('/assignment-all', deleteAllAssignment)
 
 router.post('/assignment/accept/:_id', acceptAssignment)
 router.post('/assignment/reject/:_id', rejectAssignment)

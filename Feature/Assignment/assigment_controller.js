@@ -1,9 +1,9 @@
-const { response } = require("express");
+const { response, json } = require("express");
 const Assignment = require('./assignment_model')
 const User = require('../User/user_model')
 const Availability = require('../Availability/availability_model')
 const { parse } = require('date-fns');
-const { parseDateIgnoringTimeZone } = require('../../Common/date_helper')
+const { parseDateIgnoringTimeZone, isLowerThanToday } = require('../../Common/date_helper')
 
 const mongoose = require('mongoose')
 
@@ -12,41 +12,31 @@ const createAssignment = async (req, res = response) => {
     if (!body) {
         return res.status(400).json('bad request')
     }
-
-    const dateString = body.startDate;
-    const parsedDate = parseDateIgnoringTimeZone(dateString);
-
-    // Get the timestamp for the start of today (midnight)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayTimestamp = today.getTime();
-
-    if (parsedDate.getTime() < todayTimestamp) {
-        return res.status(400).json('Bad request. Date must not be greater than today.');
-    }
-
-    const newBody = {
-        ...body,
-        startDate: parsedDate
-    }
-
-    const existingAssignment = await Assignment.findOne({
-        availability: newBody.availability,
-        startDate: newBody.startDate,
-        spot: newBody.spot,
-        status: 'user-scheduled'
-    });
-
-    if (existingAssignment) {
-        return res.status(400).json({
-            message: "An assignment with the same availability, startDate, and spot with scheduled status, already exists.",
-        });
-    }
-
-    const assignment = Assignment(newBody)
-
     try {
+        const startDate = parseDateIgnoringTimeZone(body.startDate);
+        if (isLowerThanToday(startDate)) {
+            return res.status(400).json(`Bad request. Date must be greater than today.\n
+            ${startDate}\n
+            ${Date()}`)
+        }
+        const newBody = {
+            ...body,
+            startDate: startDate
+        }
+        const existingAssignment = await Assignment.findOne({
+            availability: newBody.availability,
+            startDate: startDate,
+            spot: newBody.spot,
+            status: 'user-scheduled'
+        });
+        if (existingAssignment) {
+            return res.status(400).json({
+                message: "Bad request. An assignment with the same availability, startDate, and spot with scheduled status, already exists.",
+            });
+        }
+        const assignment = Assignment(newBody)
         const newAssignment = await assignment.save()
+        
         res.json({
             assignment: newAssignment
         })
@@ -110,6 +100,19 @@ const deleteAssignment = async (req, res = response) => {
             })
         }
         res.json(deletedDocument)
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+const deleteAllAssignment = async (req, res = response) => {
+  
+    try {
+        const deletedDocument = await Assignment.deleteMany()
+        res.json('success deleting all assignments')
 
     } catch (error) {
         return res.status(500).json({
@@ -268,5 +271,6 @@ const cancelAssignment = async (req, res = response) => {
 
 module.exports = {
     createAssignment, getAssignment, updateAssignment, deleteAssignment,
-    acceptAssignment, rejectAssignment, scheduleAssignment, cancelAssignment
+    acceptAssignment, rejectAssignment, scheduleAssignment, cancelAssignment,
+    deleteAllAssignment
 }

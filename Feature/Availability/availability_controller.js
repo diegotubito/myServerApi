@@ -131,4 +131,17 @@ const deleteAvailability = async (req, res = response) => {
     }
 }
 
-module.exports = {createAvailability, getAvailabilities, updateAvailability, deleteAvailability}
+const deleteAllAvailability = async (req, res = response) => {
+    
+    try {
+        const deletedDocument = await Availability.deleteMany()
+        res.json('all availability were deleted')
+        
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })          
+    }
+}
+
+module.exports = {createAvailability, getAvailabilities, updateAvailability, deleteAvailability, deleteAllAvailability}
