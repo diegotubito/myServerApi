@@ -15,9 +15,10 @@ const createAssignment = async (req, res = response) => {
     try {
         const startDate = parseDateIgnoringTimeZone(body.startDate);
         if (isLowerThanToday(startDate)) {
-            return res.status(400).json(`Bad request. Date must be greater than today.\n
-            ${startDate}\n
-            ${Date()}`)
+            return res.status(400).json({
+                title: "Assignment error",
+                message: "date must be greater than today."
+            })
         }
         const newBody = {
             ...body,
