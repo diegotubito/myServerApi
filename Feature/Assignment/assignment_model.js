@@ -11,9 +11,9 @@ const AssignmentSchema = new Schema({
         ref: 'availability',
         required: true
     },
-    spot: {
+    item: {
         type: Schema.Types.ObjectId,
-        ref: 'spot',
+        ref: 'item',
         required: true
     },
     status: {

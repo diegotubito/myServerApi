@@ -14,12 +14,14 @@ const createAssignment = async (req, res = response) => {
     }
     try {
         const startDate = parseDateIgnoringTimeZone(body.startDate);
+        /*
         if (isLowerThanToday(startDate)) {
             return res.status(400).json({
                 title: "Assignment error",
                 message: "date must be greater than today."
             })
         }
+        */
         const newBody = {
             ...body,
             startDate: startDate
@@ -37,12 +39,56 @@ const createAssignment = async (req, res = response) => {
         }
         const assignment = Assignment(newBody)
         const newAssignment = await assignment.save()
-        
+
         res.json({
             assignment: newAssignment
         })
     } catch (error) {
         console.log(error)
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+const getAllAssignment = async (req, res = response) => {
+    const { from, to, spotId } = req.query
+
+    if (!spotId) {
+        return res.status(400).json('bad request')
+    }
+
+    const query = {
+        spot: spotId
+    }
+
+    try {
+        const [assignments, count] = await Promise.all([
+            await Assignment.find(query)
+                .populate('availability')
+                .populate('item')
+                .populate({
+                    path: 'user',
+                    populate: {
+                        path: 'spot',
+                        populate: 'tipos'
+                    }
+                })
+                .populate({
+                    path: 'item',
+                    populate: {
+                        path: 'spot',
+                        populate: 'tipos'
+                    }
+                }),
+            await Assignment.countDocuments(query)
+        ])
+
+        res.json({
+            count,
+            assignments
+        })
+    } catch (error) {
         return res.status(500).json({
             message: error.message
         })
@@ -75,7 +121,20 @@ const getAssignment = async (req, res = response) => {
         const [assignments, count] = await Promise.all([
             await Assignment.find(query)
                 .populate('availability')
-                .populate('user'),
+                .populate({
+                    path: 'user',
+                    populate: {
+                        path: 'spot',
+                        populate: 'tipos'
+                    }
+                })
+                .populate({
+                    path: 'item',
+                    populate: {
+                        path: 'spot',
+                        populate: 'tipos'
+                    }
+                }),
             await Assignment.countDocuments(query)
         ])
 
@@ -214,7 +273,7 @@ const deleteAssignment = async (req, res = response) => {
 }
 
 const deleteAllAssignment = async (req, res = response) => {
-  
+
     try {
         const deletedDocument = await Assignment.deleteMany()
         res.json('success deleting all assignments')
@@ -377,5 +436,5 @@ const cancelAssignment = async (req, res = response) => {
 module.exports = {
     createAssignment, getAssignment, updateAssignment, deleteAssignment,
     acceptAssignment, rejectAssignment, scheduleAssignment, cancelAssignment,
-    deleteAllAssignment, getPastAssignment, getFutureAssignment
+    deleteAllAssignment, getPastAssignment, getFutureAssignment, getAllAssignment
 }

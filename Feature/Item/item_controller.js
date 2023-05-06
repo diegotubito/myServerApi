@@ -51,7 +51,12 @@ const getItem = async (req, res = response) => {
 
     try {
         const [ items, count ] = await Promise.all([
-            Item.find(filter).populate('images'),
+            Item.find(filter)
+            .populate('images')
+            .populate({
+                path: 'spot',
+                populate: 'tipos'
+            }),
             Item.countDocuments(filter)
         ])
         
