@@ -8,6 +8,14 @@ const loginPost = async (req, res = response) => {
 
     try {
         const user = await User.findOne({email})
+        .populate({
+            path: 'spot',
+            populate: {
+                path: 'tipos',
+                model: 'tipo'
+            }
+        })
+            
         if (!user) {
             return res.status(400).json({
                 message: 'user does not exist.'

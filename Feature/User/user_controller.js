@@ -16,7 +16,13 @@ const userGet = async (req, res = response) => {
         }
         const [users, count] = await Promise.all([
             User.find(filter)
-            .populate('spot'),
+            .populate({
+                path: 'spot',
+                populate: {
+                    path: 'tipos',
+                    model: 'tipo'
+                }
+            }),
             User.countDocuments(filter)
         ])
        
