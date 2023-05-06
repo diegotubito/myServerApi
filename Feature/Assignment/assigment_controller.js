@@ -90,6 +90,110 @@ const getAssignment = async (req, res = response) => {
     }
 }
 
+const getPastAssignment = async (req, res = response) => {
+    const { from, spotId } = req.query
+
+    if (!from || !spotId) {
+        return res.status(400).json('bad request')
+    }
+
+    const fromParsed = parseDateIgnoringTimeZone(from);
+
+    if (!fromParsed) {
+        return res.status(400).json('bad date format')
+    }
+
+    const query = {
+        spot: spotId,
+        startDate: {
+            $lte: fromParsed,
+        }
+    }
+
+    try {
+        const [assignments, count] = await Promise.all([
+            await Assignment.find(query)
+                .populate('availability')
+                .populate({
+                    path: 'user',
+                    populate: {
+                        path: 'spot',
+                        populate: 'tipos'
+                    }
+                })
+                .populate({
+                    path: 'spot',
+                    populate: {
+                        path: 'tipos',
+                        model: 'tipo'
+                    }
+                }),
+            await Assignment.countDocuments(query)
+        ])
+
+        res.json({
+            count,
+            assignments
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+const getFutureAssignment = async (req, res = response) => {
+    const { from, spotId } = req.query
+
+    if (!from || !spotId) {
+        return res.status(400).json('bad request')
+    }
+
+    const fromParsed = parseDateIgnoringTimeZone(from);
+
+    if (!fromParsed) {
+        return res.status(400).json('bad date format')
+    }
+
+    const query = {
+        spot: spotId,
+        startDate: {
+            $gte: fromParsed,
+        }
+    }
+
+    try {
+        const [assignments, count] = await Promise.all([
+            await Assignment.find(query)
+                .populate('availability')
+                .populate({
+                    path: 'user',
+                    populate: {
+                        path: 'spot',
+                        populate: 'tipos'
+                    }
+                })
+                .populate({
+                    path: 'spot',
+                    populate: {
+                        path: 'tipos',
+                        model: 'tipo'
+                    }
+                }),
+            await Assignment.countDocuments(query)
+        ])
+
+        res.json({
+            count,
+            assignments
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
 const deleteAssignment = async (req, res = response) => {
     const { _id } = req.params
 
@@ -273,5 +377,5 @@ const cancelAssignment = async (req, res = response) => {
 module.exports = {
     createAssignment, getAssignment, updateAssignment, deleteAssignment,
     acceptAssignment, rejectAssignment, scheduleAssignment, cancelAssignment,
-    deleteAllAssignment
+    deleteAllAssignment, getPastAssignment, getFutureAssignment
 }
