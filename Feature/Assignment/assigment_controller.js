@@ -381,10 +381,28 @@ const rejectAssignment = async (req, res = response) => {
 
     try {
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        .populate('availability')
+            .populate({
+                path: 'user',
+                populate: {
+                    path: 'spot',
+                    populate: 'tipos'
+                }
+            })
+            .populate({
+                path: 'item',
+                populate: {
+                    path: 'spot',
+                    populate: 'tipos'
+                }
+            })
+
         if (!updated) {
             return res.status(400).json('bad request')
         }
-        res.json(updated)
+        res.json({
+            assignment: updated
+        })
 
     } catch (error) {
         return res.status(500).json({
@@ -410,10 +428,29 @@ const scheduleAssignment = async (req, res = response) => {
 
     try {
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        .populate('availability')
+            .populate({
+                path: 'user',
+                populate: {
+                    path: 'spot',
+                    populate: 'tipos'
+                }
+            })
+            .populate({
+                path: 'item',
+                populate: {
+                    path: 'spot',
+                    populate: 'tipos'
+                }
+            })
+
+
         if (!updated) {
             return res.status(400).json('bad request')
         }
-        res.json(updated)
+        res.json({
+            assignment: updated
+        })
 
     } catch (error) {
         return res.status(500).json({
@@ -439,10 +476,29 @@ const cancelAssignment = async (req, res = response) => {
 
     try {
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+        .populate('availability')
+            .populate({
+                path: 'user',
+                populate: {
+                    path: 'spot',
+                    populate: 'tipos'
+                }
+            })
+            .populate({
+                path: 'item',
+                populate: {
+                    path: 'spot',
+                    populate: 'tipos'
+                }
+            })
+
+
         if (!updated) {
             return res.status(400).json('bad request')
         }
-        res.json(updated)
+        res.json({
+            assignment: updated
+        })
 
     } catch (error) {
         return res.status(500).json({
