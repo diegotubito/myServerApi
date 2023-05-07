@@ -181,10 +181,10 @@ const getPastAssignment = async (req, res = response) => {
                     }
                 })
                 .populate({
-                    path: 'spot',
+                    path: 'item',
                     populate: {
-                        path: 'tipos',
-                        model: 'tipo'
+                        path: 'spot',
+                        populate: 'tipos'
                     }
                 }),
             await Assignment.countDocuments(query)
@@ -233,10 +233,10 @@ const getFutureAssignment = async (req, res = response) => {
                     }
                 })
                 .populate({
-                    path: 'spot',
+                    path: 'item',
                     populate: {
-                        path: 'tipos',
-                        model: 'tipo'
+                        path: 'spot',
+                        populate: 'tipos'
                     }
                 }),
             await Assignment.countDocuments(query)
@@ -334,10 +334,28 @@ const acceptAssignment = async (req, res = response) => {
 
     try {
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+            .populate('availability')
+            .populate({
+                path: 'user',
+                populate: {
+                    path: 'spot',
+                    populate: 'tipos'
+                }
+            })
+            .populate({
+                path: 'item',
+                populate: {
+                    path: 'spot',
+                    populate: 'tipos'
+                }
+            })
+
         if (!updated) {
             return res.status(400).json('bad request')
         }
-        res.json(updated)
+        res.json({
+            assignment: updated
+        })
 
     } catch (error) {
         return res.status(500).json({
