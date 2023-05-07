@@ -51,8 +51,53 @@ const createAssignment = async (req, res = response) => {
     }
 }
 
+const getAllAssignmentByUser = async (req, res = response) => {
+    const { userId } = req.query
+
+    if (!userId) {
+        return res.status(400).json('bad request')
+    }
+
+    const query = {
+        user: userId
+    }
+
+    try {
+        const [assignments, count] = await Promise.all([
+            await Assignment.find(query)
+                .populate('availability')
+                .populate('item')
+                .populate({
+                    path: 'user',
+                    populate: {
+                        path: 'spot',
+                        populate: 'tipos'
+                    }
+                })
+                .populate({
+                    path: 'item',
+                    populate: {
+                        path: 'spot',
+                        populate: 'tipos'
+                    }
+                }),
+            await Assignment.countDocuments(query)
+        ])
+
+        res.json({
+            count,
+            assignments
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+
 const getAllAssignment = async (req, res = response) => {
-    const { from, to, spotId } = req.query
+    const { spotId } = req.query
 
     if (!spotId) {
         return res.status(400).json('bad request')
@@ -510,5 +555,5 @@ const cancelAssignment = async (req, res = response) => {
 module.exports = {
     createAssignment, getAssignment, updateAssignment, deleteAssignment,
     acceptAssignment, rejectAssignment, scheduleAssignment, cancelAssignment,
-    deleteAllAssignment, getPastAssignment, getFutureAssignment, getAllAssignment
+    deleteAllAssignment, getPastAssignment, getFutureAssignment, getAllAssignment, getAllAssignmentByUser
 }
