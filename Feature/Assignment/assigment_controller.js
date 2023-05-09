@@ -363,22 +363,63 @@ const updateAssignment = async (req, res = response) => {
 }
 
 const acceptAssignment = async (req, res = response) => {
-    const { _id } = req.params
-
-    if (!_id) {
+    const { startDate, assignmentId, availabilityId } = req.body
+    if (!startDate || !assignmentId || !availabilityId) {
         return res.status(400).json('bad request: _id missging')
     }
 
-    const options = {
-        new: true
-    }
 
-    const updateValues = {
-        status: 'owner-accepted'
-    }
 
     try {
-        const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
+
+
+        const startDateConverted = new Date(startDate)
+
+        const repeatedAssignments = await Assignment.aggregate([
+            {
+                $lookup: {
+                    from: 'availabilities', // the name of the Availability collection
+                    localField: 'availability',
+                    foreignField: '_id',
+                    as: 'availability'
+                },
+            },
+            {
+                $unwind: {
+                    path: "$availability",
+                },
+            },
+            {
+                $match: {
+                    "availability._id": mongoose.Types.ObjectId(availabilityId),
+                    "startDate": startDateConverted,
+                    "status": { $in: ["user-scheduled", "owner-accepted"] }
+                }
+            }
+        ])
+
+        if (repeatedAssignments.length > 0) {
+            return res.status(432).json({
+                title: 'Overlapping date and time',
+                message: 'The time slot is no longer available. Do not reject it. Wait the user to schedule.'
+            })
+        }
+
+        const options = {
+            new: true
+        }
+
+        const expirationDate = {
+            duration: 10,
+            startDate: Date()
+        }
+
+        const updateValues = {
+            status: 'owner-accepted',
+            expiration: expirationDate
+        }
+
+        const updated = await Assignment.findByIdAndUpdate(assignmentId, updateValues, options)
             .populate('availability')
             .populate({
                 path: 'user',
@@ -398,10 +439,24 @@ const acceptAssignment = async (req, res = response) => {
         if (!updated) {
             return res.status(400).json('bad request')
         }
+
+        const timer = setTimeout(async () => {
+            const assignment = await Assignment.findById(updated._id);
+            if (assignment.status === 'owner-accepted') {
+                const newStatus = {
+                    status: 'owner-expired'
+                }
+                await Assignment.findByIdAndUpdate(assignmentId, newStatus, options)
+                clearTimeout(timer);
+            } else {
+                clearTimeout(timer);
+            }
+          }, updated.expiration.duration * 60 * 1000);
+
+
         res.json({
             assignment: updated
         })
-
     } catch (error) {
         return res.status(500).json({
             message: error.message
@@ -426,7 +481,7 @@ const rejectAssignment = async (req, res = response) => {
 
     try {
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
-        .populate('availability')
+            .populate('availability')
             .populate({
                 path: 'user',
                 populate: {
@@ -463,6 +518,8 @@ const scheduleAssignment = async (req, res = response) => {
         return res.status(400).json('bad request: _id missging')
     }
 
+
+
     const options = {
         new: true
     }
@@ -472,8 +529,30 @@ const scheduleAssignment = async (req, res = response) => {
     }
 
     try {
+        const assignment = await Assignment.findById(_id)
+        if (assignment.status != 'owner-accepted') {
+            return res.status(432).json({
+                title: 'Status Error',
+                message: 'Schedule not allowed at this moment.'
+            })
+        }
+        const expiration = assignment.expiration
+        if (expiration != null) {
+            const startDate = new Date(expiration.startDate);
+            const durationInMinutes = expiration.duration;
+            const expirationTime = new Date(startDate.getTime() + durationInMinutes * 60000);
+            const currentTime = new Date();
+
+            if (currentTime > expirationTime) {
+                return res.status(432).json({
+                    title: 'Expiration',
+                    message: 'the assignment has expired.'
+                })
+            }
+        }
+
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
-        .populate('availability')
+            .populate('availability')
             .populate({
                 path: 'user',
                 populate: {
@@ -520,8 +599,31 @@ const cancelAssignment = async (req, res = response) => {
     }
 
     try {
+
+        const assignment = await Assignment.findById(_id)
+        if (assignment.status != 'owner-accepted') {
+            return res.status(432).json({
+                title: 'Status Error',
+                message: 'Cancel not allowed at this moment.'
+            })
+        }
+        const expiration = assignment.expiration
+        if (expiration != null) {
+            const startDate = new Date(expiration.startDate);
+            const durationInMinutes = expiration.duration;
+            const expirationTime = new Date(startDate.getTime() + durationInMinutes * 60000);
+            const currentTime = new Date();
+
+            if (currentTime > expirationTime) {
+                return res.status(432).json({
+                    title: 'Expiration',
+                    message: 'the assignment has expired.'
+                })
+            }
+        }
+
         const updated = await Assignment.findByIdAndUpdate(_id, updateValues, options)
-        .populate('availability')
+            .populate('availability')
             .populate({
                 path: 'user',
                 populate: {

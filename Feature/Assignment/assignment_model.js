@@ -1,4 +1,13 @@
 const { Schema, model } = require('mongoose')
+const Expiration = new Schema({
+    duration: {
+        type: Number,
+        default: 10
+    },
+    startDate: {
+        type: Date
+    }
+})
 
 const AssignmentSchema = new Schema({
     user: {
@@ -18,7 +27,7 @@ const AssignmentSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['user-pending', 'owner-accepted', 'owner-rejected', 'user-scheduled', 'user-cancelled'],
+        enum: ['user-pending', 'owner-accepted', 'owner-expired', 'owner-rejected', 'user-scheduled', 'user-cancelled'],
         default: 'user-pending'
     },
     startDate: {
@@ -28,6 +37,9 @@ const AssignmentSchema = new Schema({
     amount: {
         type: Number,
         required: true
+    },
+    expiration: {
+        type: Expiration
     }
 }, {timestamps: true});
 
