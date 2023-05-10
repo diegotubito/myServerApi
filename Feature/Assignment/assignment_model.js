@@ -2,7 +2,7 @@ const { Schema, model } = require('mongoose')
 const Expiration = new Schema({
     duration: {
         type: Number,
-        default: 10
+        default: 3
     },
     startDate: {
         type: Date

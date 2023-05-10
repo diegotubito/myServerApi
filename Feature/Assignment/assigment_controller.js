@@ -367,12 +367,8 @@ const acceptAssignment = async (req, res = response) => {
     if (!startDate || !assignmentId || !availabilityId) {
         return res.status(400).json('bad request: _id missging')
     }
-
-
-
+    
     try {
-
-
         const startDateConverted = new Date(startDate)
 
         const repeatedAssignments = await Assignment.aggregate([
@@ -410,7 +406,7 @@ const acceptAssignment = async (req, res = response) => {
         }
 
         const expirationDate = {
-            duration: 10,
+            duration: 3,
             startDate: Date()
         }
 
@@ -442,6 +438,10 @@ const acceptAssignment = async (req, res = response) => {
 
         const timer = setTimeout(async () => {
             const assignment = await Assignment.findById(updated._id);
+            if (!assignment) {
+                // there's no res, because this is something exceptional
+                return 
+            }
             if (assignment.status === 'owner-accepted') {
                 const newStatus = {
                     status: 'owner-expired'
