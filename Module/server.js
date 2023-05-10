@@ -2,15 +2,21 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const {connectDataBase} = require('../Database/database')
-
+const http = require('http');
+const socketIO = require('socket.io');
 
 class Server {
     constructor() {
-        this.app = app
-        
-        this.#middleware()
+        this.app = app;
+        this.server = http.createServer(this.app);
+        this.io = socketIO(this.server);
+        this.app.io = this.io
 
-        this.#router()
+        this.#middleware();
+        this.#router();
+        this.#configureSockets();
+
+        this.app.clients = new Map()
     }
 
     #middleware() {
@@ -32,15 +38,39 @@ class Server {
         this.app.use('/api/v1/mp/sdk', require('../Feature/MercadoPago/mp_sdk_router'))
     }
 
+    #configureSockets() {
+        this.io.on('connection', (socket) => {
+            console.log('New client connected:', socket.id);
+    
+            socket.on('register-user', (userId) => {
+                this.app.clients.set(userId, socket.id);
+                console.log('user id set:', userId)
+            });
+    
+            // Add your custom event listeners here
+    
+            socket.on('disconnect', () => {
+                // Remove the disconnected client from the clients Map
+                for (const [userId, storedSocketId] of this.app.clients.entries()) {
+                    if (storedSocketId === socket.id) {
+                        this.app.clients.delete(userId);
+                        break;
+                    }
+                }
+                console.log('Client disconnected:', socket.id);
+            });
+        });
+    }
+
     connect() {
-        this.app.listen(process.env.PORT, () => {
-            console.log('Server running at', process.env.PORT)
-            this.#connectDB()
-        })
+        this.server.listen(process.env.PORT, () => {
+            console.log('Server running at', process.env.PORT);
+            this.#connectDB();
+        });
     }
 
     #connectDB() {
-       connectDataBase()
+        connectDataBase();
     }
 }
 

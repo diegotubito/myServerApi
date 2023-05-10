@@ -367,7 +367,7 @@ const acceptAssignment = async (req, res = response) => {
     if (!startDate || !assignmentId || !availabilityId) {
         return res.status(400).json('bad request: _id missging')
     }
-    
+
     try {
         const startDateConverted = new Date(startDate)
 
@@ -440,7 +440,7 @@ const acceptAssignment = async (req, res = response) => {
             const assignment = await Assignment.findById(updated._id);
             if (!assignment) {
                 // there's no res, because this is something exceptional
-                return 
+                return
             }
             if (assignment.status === 'owner-accepted') {
                 const newStatus = {
@@ -451,7 +451,29 @@ const acceptAssignment = async (req, res = response) => {
             } else {
                 clearTimeout(timer);
             }
-          }, updated.expiration.duration * 60 * 1000);
+        }, updated.expiration.duration * 60 * 1000);
+
+        
+        
+
+
+
+
+
+
+
+    // Access the io instance from the app object
+    const { io, clients } = req.app;
+
+    // Get the socket ID of the user you want to send the message to
+    console.log(updated.user._id.toString())
+    const targetSocketId = clients.get(updated.user._id.toString());
+
+    if (targetSocketId) {
+        // Emit the message only to the specific client
+        io.to(targetSocketId).emit('new-message', 'hey there');
+    }
+
 
 
         res.json({
