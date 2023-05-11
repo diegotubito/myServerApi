@@ -45,7 +45,12 @@ class Server {
     
             socket.on('register-user', (userId) => {
                 this.app.clients.set(userId, socket.id);
-                console.log('user id set:', userId)
+                console.log('registered:', userId)
+            });
+
+            socket.on('unregister-user', (userId) => {
+                this.app.clients.delete(userId);
+                console.log('unregistered: ', userId)
             });
     
             // Add your custom event listeners here

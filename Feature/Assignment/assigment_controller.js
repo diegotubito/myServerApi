@@ -43,6 +43,24 @@ const createAssignment = async (req, res = response) => {
         }
         const assignment = Assignment(newBody)
         const newAssignment = await assignment.save()
+        const loadAssignment = await Assignment.findById(newAssignment._id)
+        .populate({
+            path: 'user',
+            populate: {
+                path: 'spot',
+                populate: 'tipos'
+            }
+        })
+        .populate({
+            path: 'item',
+            populate: {
+                path: 'spot',
+                populate: 'tipos'
+            }
+        })
+        const clientId = loadAssignment.user._id.toString()
+        const sourceId = loadAssignment.item.spot._id.toString()
+        sendUpdateNeedEmitter(req, [sourceId, clientId])
 
         res.json({
             assignment: newAssignment
