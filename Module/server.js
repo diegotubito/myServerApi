@@ -11,6 +11,7 @@ class Server {
         this.server = http.createServer(this.app);
         this.io = socketIO(this.server);
         this.app.io = this.io
+        this.app.timers = {}
 
         this.#middleware();
         this.#router();
