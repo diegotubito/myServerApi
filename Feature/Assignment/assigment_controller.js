@@ -4,7 +4,7 @@ const User = require('../User/user_model')
 const Availability = require('../Availability/availability_model')
 const { parse } = require('date-fns');
 const { parseDateIgnoringTimeZone, isLowerThanToday } = require('../../Common/date_helper')
-const { emit } = require('../../Common/socket_helper')
+const { emit, sendUpdateNeedEmitter } = require('../../Common/socket_helper')
 
 const mongoose = require('mongoose');
 const { deleteTimer } = require("../../Common/timer_helper");
@@ -460,18 +460,9 @@ const acceptAssignment = async (req, res = response) => {
         req.app.timers[updated._id] = timer
         console.log('adding', req.app.timers)
 
-
-        const clientUserId = updated.user._id.toString()
-        const ownerUserId = updated.item.spot._id.toString()
-        if (clientUserId && ownerUserId) {
-            emit(req, [clientUserId, ownerUserId], 'new-message', {
-                title: 'testing abc',
-                message: 'ABC',
-                action: 'needUpdate'
-            })
-        } else {
-            console.log('could not emit because clientUserId or OwnerUserId is null')
-        }
+        const clientId = updated.user._id.toString()
+        const sourceId = updated.item.spot._id.toString()
+        sendUpdateNeedEmitter(req, [sourceId, clientId])
 
         res.json({
             assignment: updated
@@ -519,6 +510,10 @@ const rejectAssignment = async (req, res = response) => {
         if (!updated) {
             return res.status(400).json('bad request')
         }
+
+        const clientId = updated.user._id.toString()
+        const sourceId = updated.item.spot._id.toString()
+        sendUpdateNeedEmitter(req, [sourceId, clientId])
 
         res.json({
             assignment: updated
@@ -594,19 +589,10 @@ const scheduleAssignment = async (req, res = response) => {
         }
 
         deleteTimer(req, updated._id)
-        
-        const clientUserId = updated.user._id.toString()
-        const ownerUserId = updated.item.spot._id.toString()
-        if (clientUserId && ownerUserId) {
-            emit(req, [clientUserId, ownerUserId], 'new-message', {
-                title: 'testing abc',
-                message: 'ABC',
-                action: 'needUpdate'
-            })
-        } else {
-            console.log('could not emit because clientUserId or OwnerUserId is null')
-        }
 
+        const clientId = updated.user._id.toString()
+        const sourceId = updated.item.spot._id.toString()
+        sendUpdateNeedEmitter(req, [sourceId, clientId])
 
         res.json({
             assignment: updated
@@ -682,18 +668,9 @@ const cancelAssignment = async (req, res = response) => {
 
         deleteTimer(req, updated._id)
 
-
-        const clientUserId = updated.user._id.toString()
-        const ownerUserId = updated.item.spot._id.toString()
-        if (clientUserId && ownerUserId) {
-            emit(req, [clientUserId, ownerUserId], 'new-message', {
-                title: 'testing abc',
-                message: 'ABC',
-                action: 'needUpdate'
-            })
-        } else {
-            console.log('could not emit because clientUserId or OwnerUserId is null')
-        }
+        const clientId = updated.user._id.toString()
+        const sourceId = updated.item.spot._id.toString()
+        sendUpdateNeedEmitter(req, [sourceId, clientId])
 
         res.json({
             assignment: updated

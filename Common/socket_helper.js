@@ -1,5 +1,13 @@
 const { request } = require('express');
 
+function sendUpdateNeedEmitter(req = request, userIds) {
+    emit(req, userIds, 'new-message', {
+        title: 'testing abc',
+        message: 'ABC',
+        action: 'needUpdate'
+    })
+}
+
 function emit(req = request, userIds, eventKey, message) {
     // Access the io instance from the app object
     const { io, clients } = req.app;
@@ -15,4 +23,4 @@ function emit(req = request, userIds, eventKey, message) {
     }
 }
 
-module.exports = { emit }
+module.exports = { emit, sendUpdateNeedEmitter }
