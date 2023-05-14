@@ -38,8 +38,12 @@ const loginPost = async (req, res = response) => {
         const {_id} = user
         const token = jwtoken.sign({ _id: _id }, process.env.PUBLIC_SECRET_KEY, { expiresIn: 60 * 60 });
        
-        user.deviceTokens.push(devicetoken)
+        if (devicetoken && !user.deviceTokens.includes(devicetoken)) {
+            user.deviceTokens.push(devicetoken);
+        }
+
         await user.save()
+        
 
         res.json({
             user,

@@ -64,8 +64,11 @@ const createAssignment = async (req, res = response) => {
         sendUpdateNeedEmitter(req, [sourceId, clientId])
 
         // send notification to spot users
-        const user = await User.findOne({spot: loadAssignment.user.spot._id})
-        sendNotification(req, user.deviceTokens)
+        const user = await User.findOne({spot: loadAssignment.item.spot._id})
+        const payload = {
+            user
+        }
+       sendNotification(req, user.deviceTokens, "\uD83D\uDCE7 \u2709 A new assignment has been created. Accept it as soon as possible.", payload)
 
         res.json({
             assignment: newAssignment
@@ -489,6 +492,13 @@ const acceptAssignment = async (req, res = response) => {
         const clientId = updated.user._id.toString()
         const sourceId = updated.item.spot._id.toString()
         sendUpdateNeedEmitter(req, [sourceId, clientId])
+
+         // send notification to spot users
+         const payload = {
+             updated
+         }
+        sendNotification(req, updated.user.deviceTokens, "Your appointment has been accepted.", payload)
+ 
 
         res.json({
             assignment: updated

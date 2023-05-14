@@ -20,10 +20,8 @@ class Server {
         this.#configureSockets();
 
         this.app.clients = new Map()
-
-        const remoteNotification = new RemoteNotification()
-        this.app.apn = remoteNotification.apn
-        this.app.apnProvider = remoteNotification.apnProvider
+        
+        this.app.remoteNotification = new RemoteNotification()
     }
 
     #middleware() {
