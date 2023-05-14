@@ -57,8 +57,7 @@ const UserSchema = Schema({
         default: false
     },
     deviceTokens: [{
-        type: String,
-        unique: true
+        type: String
     }]
 })
 

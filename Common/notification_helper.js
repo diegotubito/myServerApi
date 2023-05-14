@@ -1,6 +1,6 @@
 const { request } = require('express');
 
-function sendNotification(req = request, deviceTokens, title, payload) {
+function sendNotification(req = request, deviceTokens, alert, payload) {
     // Prepare and send push notifications
     if (deviceTokens.lenght == 0) {
         return
@@ -10,7 +10,7 @@ function sendNotification(req = request, deviceTokens, title, payload) {
     note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
     note.badge = 1;
     note.sound = "ping.aiff";
-    note.alert = title
+    note.alert = alert
     note.payload = payload
     note.topic = "appointmentInternal";
 

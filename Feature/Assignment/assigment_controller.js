@@ -62,13 +62,7 @@ const createAssignment = async (req, res = response) => {
         const clientId = loadAssignment.user._id.toString()
         const sourceId = loadAssignment.item.spot._id.toString()
         sendUpdateNeedEmitter(req, [sourceId, clientId])
-
-        // send notification to spot users
-        const user = await User.findOne({spot: loadAssignment.item.spot._id})
-        const payload = {
-            user
-        }
-       sendNotification(req, user.deviceTokens, "\uD83D\uDCE7 \u2709 A new assignment has been created. Accept it as soon as possible.", payload)
+        sendNotificationToSpot(req, sourceId, "New appointment created.", "A new request has been created.")
 
         res.json({
             assignment: newAssignment
@@ -79,6 +73,19 @@ const createAssignment = async (req, res = response) => {
             message: error.message
         })
     }
+}
+
+async function sendNotificationToSpot(req = request, id, title, body) {
+        // send notification to spot users
+        const user = await User.findOne({spot: id})
+        const payload = {
+            user
+        }
+        const alert = {
+            title: title,  // Title for the notification
+            body: body,  // Body text
+        }
+        sendNotification(req, user.deviceTokens, alert, payload)
 }
 
 const getAllAssignmentByUser = async (req, res = response) => {
@@ -492,14 +499,16 @@ const acceptAssignment = async (req, res = response) => {
         const clientId = updated.user._id.toString()
         const sourceId = updated.item.spot._id.toString()
         sendUpdateNeedEmitter(req, [sourceId, clientId])
-
-         // send notification to spot users
-         const payload = {
-             updated
-         }
-        sendNotification(req, updated.user.deviceTokens, "Your appointment has been accepted.", payload)
- 
-
+       
+        const payload = {
+            updated
+        }
+        const alert = {
+            title: "Appointment Accepted",  // Title for the notification
+            body: "You have 5 minutes to schedule your appointment.",  // Body text
+        }
+        sendNotification(req, updated.user.deviceTokens, alert, payload)
+       
         res.json({
             assignment: updated
         })
@@ -550,6 +559,15 @@ const rejectAssignment = async (req, res = response) => {
         const clientId = updated.user._id.toString()
         const sourceId = updated.item.spot._id.toString()
         sendUpdateNeedEmitter(req, [sourceId, clientId])
+
+        const payload = {
+            updated
+        }
+        const alert = {
+            title: "Appointment Rejected",  // Title for the notification
+            body: "The owner has rejected your assignment.",  // Body text
+        }
+        sendNotification(req, updated.user.deviceTokens, alert, payload)
 
         res.json({
             assignment: updated
@@ -629,6 +647,7 @@ const scheduleAssignment = async (req, res = response) => {
         const clientId = updated.user._id.toString()
         const sourceId = updated.item.spot._id.toString()
         sendUpdateNeedEmitter(req, [sourceId, clientId])
+        sendNotificationToSpot(req, sourceId, "Congratulations", "The user created an appointment.")
 
         res.json({
             assignment: updated
@@ -707,6 +726,7 @@ const cancelAssignment = async (req, res = response) => {
         const clientId = updated.user._id.toString()
         const sourceId = updated.item.spot._id.toString()
         sendUpdateNeedEmitter(req, [sourceId, clientId])
+        sendNotificationToSpot(req, sourceId, "Ohh no!", "The user cancelled assignment.")
 
         res.json({
             assignment: updated

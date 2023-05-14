@@ -11,10 +11,10 @@ const createItem = async (req, res = response) => {
             message: 'request body needed'
         })
     }
-
     try {
         // Save images and get their _ids
-        const imageDocs = await Promise.all(body.images.map(img => {
+        const imageDocs = await Promise.all(body.images.map(image => {
+            const {_id, ...img} = image // remove _id param that comes from the client
             const newImage = new Image(img);
             return newImage.save().then(savedImage => savedImage);
         }));

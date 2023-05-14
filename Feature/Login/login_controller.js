@@ -43,8 +43,7 @@ const loginPost = async (req, res = response) => {
         }
 
         await user.save()
-        
-
+   
         res.json({
             user,
             token
