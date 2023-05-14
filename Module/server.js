@@ -4,6 +4,8 @@ const cors = require('cors')
 const {connectDataBase} = require('../Database/database')
 const http = require('http');
 const socketIO = require('socket.io');
+const RemoteNotification = require('../Setup/APNS/apns')
+
 
 class Server {
     constructor() {
@@ -18,6 +20,10 @@ class Server {
         this.#configureSockets();
 
         this.app.clients = new Map()
+
+        const remoteNotification = new RemoteNotification()
+        this.app.apn = remoteNotification.apn
+        this.app.apnProvider = remoteNotification.apnProvider
     }
 
     #middleware() {

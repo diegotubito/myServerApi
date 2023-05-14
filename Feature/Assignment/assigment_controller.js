@@ -5,6 +5,7 @@ const Availability = require('../Availability/availability_model')
 const { parse } = require('date-fns');
 const { parseDateIgnoringTimeZone, isLowerThanToday } = require('../../Common/date_helper')
 const { emit, sendUpdateNeedEmitter } = require('../../Common/socket_helper')
+const { sendNotification } = require('../../Common/notification_helper')
 
 const mongoose = require('mongoose');
 const { deleteTimer } = require("../../Common/timer_helper");
@@ -61,6 +62,10 @@ const createAssignment = async (req, res = response) => {
         const clientId = loadAssignment.user._id.toString()
         const sourceId = loadAssignment.item.spot._id.toString()
         sendUpdateNeedEmitter(req, [sourceId, clientId])
+
+        // send notification to spot users
+        const user = await User.findOne({spot: loadAssignment.user.spot._id})
+        sendNotification(req, user.deviceTokens)
 
         res.json({
             assignment: newAssignment
@@ -419,7 +424,7 @@ const acceptAssignment = async (req, res = response) => {
         if (repeatedAssignments.length > 0) {
             return res.status(432).json({
                 title: 'Overlapping date and time',
-                message: 'The time slot is no longer available. Do not reject it. Wait the user to schedule.'
+                message: 'Time slot is no longer available. Do not reject it. Wait until the user schedule.'
             })
         }
 
@@ -428,7 +433,7 @@ const acceptAssignment = async (req, res = response) => {
         }
 
         const expirationDate = {
-            duration: 3,
+            duration: 1,
             startDate: Date()
         }
 
@@ -470,6 +475,9 @@ const acceptAssignment = async (req, res = response) => {
                 }
                 await Assignment.findByIdAndUpdate(assignmentId, newStatus, options)
                 deleteTimer(req, updated._id)
+                const clientId = updated.user._id.toString()
+                const sourceId = updated.item.spot._id.toString()
+                sendUpdateNeedEmitter(req, [sourceId, clientId])
             } else {
                 deleteTimer(req, updated._id)
             }

@@ -5,7 +5,7 @@ const jwtoken = require('jsonwebtoken')
 
 const loginPost = async (req, res = response) => {
     const {email, password} = req.body
-
+    const {devicetoken} = req.headers
     try {
         const user = await User.findOne({email})
         .populate({
@@ -37,6 +37,9 @@ const loginPost = async (req, res = response) => {
 
         const {_id} = user
         const token = jwtoken.sign({ _id: _id }, process.env.PUBLIC_SECRET_KEY, { expiresIn: 60 * 60 });
+       
+        user.deviceTokens.push(devicetoken)
+        await user.save()
 
         res.json({
             user,

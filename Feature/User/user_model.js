@@ -1,5 +1,12 @@
 const {Schema, model} = require('mongoose')
 
+const Notification = new Schema({
+    deviceToken: {
+        type: String,
+        unique: true
+    }
+})
+
 const UserSchema = Schema({
     username: {
         type: String,
@@ -48,7 +55,11 @@ const UserSchema = Schema({
     emailVerified: {
         type: Boolean,
         default: false
-    }
+    },
+    deviceTokens: [{
+        type: String,
+        unique: true
+    }]
 })
 
 // Overriding toJSON method
