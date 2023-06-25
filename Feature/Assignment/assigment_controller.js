@@ -18,7 +18,7 @@ const createAssignment = async (req, res = response) => {
         return res.status(400).json('bad request')
     }
     try {
-        const startDate = parseDateIgnoringTimeZone(body.startDate);
+        const startDate = new Date(body.startDate)
         /*
         if (isLowerThanToday(startDate)) {
             return res.status(400).json({
@@ -184,8 +184,8 @@ const getAssignment = async (req, res = response) => {
         return res.status(400).json('bad request')
     }
 
-    const fromParsed = parseDateIgnoringTimeZone(from);
-    const toParsed = parseDateIgnoringTimeZone(to);
+    const fromParsed = new Date(from)
+    const toParsed = new Date(to)
 
     if (!fromParsed || !toParsed) {
         return res.status(400).json('bad date format')
