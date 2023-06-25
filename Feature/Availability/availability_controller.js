@@ -1,7 +1,6 @@
 const { response } = require("express");
 const Availability = require('./availability_model')
 const Item = require('../Item/item_model')
-const { parseDateIgnoringTimeZone, parseTime } = require('../../Common/date_helper')
 const { hasOverlappingAvailability } = require('./availability_helper')
 
 
@@ -12,41 +11,20 @@ const createAvailability = async (req, res = response) => {
             message: 'request error'
         })
     }
-    /*
-    const startTime = `01/01/2001T${body.startTime}` 
-    const endTime = `01/01/2001T${body.endTime}` 
-    const parsedStartTime = parseDateIgnoringTimeZone(startTime);
-    const parsedEndTime = parseDateIgnoringTimeZone(endTime);
-*/
 
-    const parsedStartTime = parseTime(body.startTime);
-    const parsedEndTime = parseTime(body.endTime);
-
+    const parsedStartDate = new Date(body.startDate);
+    const parsedEndDate = new Date(body.endDate);
 
     const newBody = {
-        dayOfWeek: body.dayOfWeek,
-        startTime: parsedStartTime,
-        endTime: parsedEndTime,
-        priceAdjustmentPercentage: body.priceAdjustmentPercentage,
+        period: body.period,
+        startDate: parsedStartDate,
+        endDate: parsedEndDate,
         service: body.service
     }
 
     const availability = await Availability(newBody)
     try {
-     
-        /*
-        const item = await Item.findById(newBody.service)
-        if (!item || item.itemType != 'service') {
-            return res.status(400).json({
-                message: 'item not found or the item is not a service'
-            })
-        }
-        item.availabilities.push(availability)
-        await item.save()
-*/
-
-
-        const overlap = await hasOverlappingAvailability(newBody.service, availability.dayOfWeek, parsedStartTime, parsedEndTime)
+        const overlap = await hasOverlappingAvailability(newBody.service, parsedStartDate, parsedEndDate)
 
         if (overlap) {
             return res.status(400).json({
@@ -55,7 +33,11 @@ const createAvailability = async (req, res = response) => {
         }
 
         const newObject = await availability.save()
-        res.json(newObject)
+        
+        res.json({
+            availability: newObject
+        })
+
     } catch (error) {
         console.log(error)
         return res.status(500).json({
@@ -103,7 +85,9 @@ const updateAvailability = async (req, res = response) => {
                 message: 'could not update availability'
             }) 
         }
-        res.json(updatedDocument)
+        res.json({
+            availability: updatedDocument
+        })
     } catch (error) {
         return res.status(500).json({
             message: error.message
@@ -122,7 +106,9 @@ const deleteAvailability = async (req, res = response) => {
                 message: 'could not delete availability'
             }) 
         }
-        res.json(deletedDocument)
+        res.json({
+            availability: deletedDocument
+        })
         
     } catch (error) {
         return res.status(500).json({

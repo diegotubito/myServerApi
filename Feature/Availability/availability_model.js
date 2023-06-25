@@ -1,17 +1,15 @@
 const { Schema, model } = require('mongoose')
 
 const AvailabilityShchema = new Schema({
-    dayOfWeek: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 6
+    period: {
+        type: String,
+        required: true
     },
-    startTime: {
+    startDate: {
         type: Date,
         required: true
     },
-    endTime: {
+    endDate: {
         type: Date,
         required: true
     },
@@ -23,10 +21,6 @@ const AvailabilityShchema = new Schema({
     isEnabled: {
         type: Boolean,
         default: true
-    },
-    priceAdjustmentPercentage: {
-        type: Number, // field can have positive values for increments and negative values for discounts.
-        default: 0
     }
 }, {timestamps: true} )
 
