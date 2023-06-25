@@ -3,7 +3,7 @@ const Assignment = require('./assignment_model')
 const User = require('../User/user_model')
 const Availability = require('../Availability/availability_model')
 const { parse } = require('date-fns');
-const { parseDateIgnoringTimeZone, isLowerThanToday } = require('../../Common/date_helper')
+const { isLowerThanToday } = require('../../Common/date_helper')
 const { emit, sendUpdateNeedEmitter } = require('../../Common/socket_helper')
 const { sendNotification } = require('../../Common/notification_helper')
 
@@ -238,7 +238,7 @@ const getPastAssignment = async (req, res = response) => {
         return res.status(400).json('bad request')
     }
 
-    const fromParsed = parseDateIgnoringTimeZone(from);
+    const fromParsed = new Date(from)
 
     if (!fromParsed) {
         return res.status(400).json('bad date format')
@@ -290,7 +290,7 @@ const getFutureAssignment = async (req, res = response) => {
         return res.status(400).json('bad request')
     }
 
-    const fromParsed = parseDateIgnoringTimeZone(from);
+    const fromParsed = new Date(from);
 
     if (!fromParsed) {
         return res.status(400).json('bad date format')
@@ -371,8 +371,7 @@ const updateAssignment = async (req, res = response) => {
     const id = req.params._id
     const { _id, service, user, availability, spot, amount, ...body } = req.body
 
-    const formatPattern = 'MM-dd-yyyy\'T\'HH:mm:ss';
-    const startDateAndTimeParsed = parseDateIgnoringTimeZone(body.startDateAndTime, formatPattern);
+    const startDateAndTimeParsed = new Date(body.startDateAndTime);
 
     if (!startDateAndTimeParsed) {
         return res.status(400).json('bad request: date format')
