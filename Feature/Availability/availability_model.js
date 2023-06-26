@@ -21,6 +21,9 @@ const AvailabilityShchema = new Schema({
     isEnabled: {
         type: Boolean,
         default: true
+    },
+    expiration: {
+        type: Date
     }
 }, {timestamps: true} )
 

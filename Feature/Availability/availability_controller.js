@@ -13,6 +13,7 @@ const createAvailability = async (req, res = response) => {
 
     const parsedStartDate = new Date(body.startDate);
     const parsedEndDate = new Date(body.endDate);
+   
 
     if (parsedStartDate >= parsedEndDate) {
         return res.status(400).json({
@@ -20,11 +21,22 @@ const createAvailability = async (req, res = response) => {
         })
     }
 
+    let expiration = null
+    if (body.expiration) {
+        expiration = new Date(body.expiration)
+        if (expiration < parsedEndDate) {
+            return res.status(400).json({
+                message: 'expiration date must be greater than end date.'
+            })
+        }    
+    }
+
     const newBody = {
         period: body.period,
         startDate: parsedStartDate,
         endDate: parsedEndDate,
-        service: body.service
+        service: body.service,
+        expiration: expiration
     }
 
     const availability = await Availability(newBody)
@@ -94,6 +106,18 @@ const updateAvailability = async (req, res = response) => {
         return res.status(400).json({
             message: 'start date must be greater than end date.'
         })
+    }
+
+    let expiration = null
+    if (body.expiration) {
+        expiration = new Date(body.expiration)
+        if (expiration < endDate) {
+            return res.status(400).json({
+                message: 'expiration date must be greater than end date.'
+            })
+        }    
+    } else {
+        body.expiration = null
     }
 
     const options = {
