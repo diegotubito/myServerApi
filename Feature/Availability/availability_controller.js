@@ -3,7 +3,6 @@ const Availability = require('./availability_model')
 const Item = require('../Item/item_model')
 const { hasOverlappingAvailability } = require('./availability_helper')
 
-
 const createAvailability = async (req, res = response) => {
     const body = req.body
     if (!body) {
@@ -15,6 +14,12 @@ const createAvailability = async (req, res = response) => {
     const parsedStartDate = new Date(body.startDate);
     const parsedEndDate = new Date(body.endDate);
 
+    if (parsedStartDate >= parsedEndDate) {
+        return res.status(400).json({
+            message: 'start date must be greater than end date.'
+        })
+    }
+
     const newBody = {
         period: body.period,
         startDate: parsedStartDate,
@@ -24,6 +29,14 @@ const createAvailability = async (req, res = response) => {
 
     const availability = await Availability(newBody)
     try {
+        // Check if item is a service
+        const item = await Item.findById(body.service)
+        if (item.itemType != "service") {
+            return res.status(400).json({
+                message: 'request error, item is not a service.'
+            })
+        }
+
         const overlap = await hasOverlappingAvailability(newBody.service, parsedStartDate, parsedEndDate)
 
         if (overlap) {
@@ -73,6 +86,15 @@ const getAvailabilities = async (req, res = response) => {
 const updateAvailability = async (req, res = response) => {
     const id = req.params._id 
     const {_id, service, isEnabled, ...body} = req.body
+
+    const startDate = new Date(body.startDate);
+    const endDate = new Date(body.endDate);
+
+    if (startDate >= endDate) {
+        return res.status(400).json({
+            message: 'start date must be greater than end date.'
+        })
+    }
 
     const options = {
         new: true
