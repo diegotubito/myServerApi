@@ -12,7 +12,7 @@ function sendNotification(req = request, deviceTokens, alert, payload) {
     note.sound = "ping.aiff";
     note.alert = alert
     note.payload = payload
-    note.topic = "appointmentInternal";
+    note.topic = "ddg-scheduler";
 
     const filteredArray = deviceTokens.filter(n => n)
    
