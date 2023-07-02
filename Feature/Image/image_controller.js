@@ -14,6 +14,7 @@ const getImage = async (req, res) => {
         res.setHeader('Content-Type', response.headers['content-type']);
 
         // Pipe the image stream directly to the client
+        console.log('image success')
         response.data.pipe(res);
     } catch (error) {
         console.error('Error downloading the image:', error);

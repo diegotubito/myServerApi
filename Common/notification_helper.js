@@ -21,7 +21,8 @@ function sendNotification(req = request, deviceTokens, alert, payload) {
         console.log(result);
     }).catch(error => {
         // Error occurred while sending the notification
-        console.error(error);
+        console.log('error sending push')
+        //console.error(error);
     });
 }
 

@@ -1,8 +1,8 @@
 const apn = require('apn');
 
-const privateKeyPath = './AuthKey_Y84TBQ8U54.p8'
+const privateKeyPath = './AuthKey_2WGZS77LV7.p8'
 const teamId = 'S2BEC8V882';
-const keyId = 'Y84TBQ8U54';
+const keyId = '2WGZS77LV7';
 
 // Create authentication options
 const options = {

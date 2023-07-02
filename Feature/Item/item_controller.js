@@ -75,13 +75,18 @@ const updateItem = async (req, res = response) => {
     const body = req.body
 
     const {user, _id, isEnabled, ... updates} = body
+    
+    const filteredUpdates = Object.entries(updates)
+    .filter(([key, value]) => value!== null && value!== undefined &&!(Array.isArray(value) && value.length === 0))
+    .reduce((obj, [key, value]) => ({...obj, [key]: value }), {});
 
+    console.log(filteredUpdates)
     const options = {
         new: true
     }
 
     try {
-        const updated = await Item.findByIdAndUpdate(id, updates, options)
+        const updated = await Item.findByIdAndUpdate(id, filteredUpdates, options)
         if (!updated) {
             return res.status(400).json({
                 message: 'could not update item'
